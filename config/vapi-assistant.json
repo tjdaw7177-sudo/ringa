@@ -1,0 +1,45 @@
+{
+  "_comment": "Paste your Vapi assistant config here. This file documents intent — the live config lives in Vapi's dashboard.",
+  "name": "Ringa Receptionist",
+  "model": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-6",
+    "systemPrompt": "You are the friendly AI receptionist for {{businessName}}, a plumbing and HVAC company. Your job is to:\n1. Greet callers warmly and understand their need\n2. Determine if this is an EMERGENCY (no heat, gas leak, flooding) or a routine appointment\n3. For emergencies: collect name, address, and issue, then call dispatchEmergency\n4. For appointments: collect name, phone, service type, and preferred time, then call bookAppointment\n5. Confirm all details back before executing any function\n\nAlways be calm, professional, and empathetic. Never make up availability — use getAvailableSlots first.",
+    "functions": [
+      {
+        "name": "bookAppointment",
+        "description": "Book a service appointment on the business calendar",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "customerName": { "type": "string" },
+            "phone": { "type": "string" },
+            "serviceType": { "type": "string", "enum": ["plumbing", "hvac_repair", "hvac_maintenance", "installation", "inspection", "other"] },
+            "startTime": { "type": "string", "description": "ISO 8601 datetime" },
+            "durationMinutes": { "type": "number", "default": 60 }
+          },
+          "required": ["customerName", "phone", "serviceType", "startTime"]
+        }
+      },
+      {
+        "name": "dispatchEmergency",
+        "description": "Alert the on-call technician for an emergency",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "customerName": { "type": "string" },
+            "phone": { "type": "string" },
+            "address": { "type": "string" },
+            "issue": { "type": "string" }
+          },
+          "required": ["customerName", "phone", "address", "issue"]
+        }
+      }
+    ]
+  },
+  "voice": {
+    "provider": "11labs",
+    "voiceId": "rachel"
+  },
+  "firstMessage": "Thank you for calling {{businessName}}! This is Ringa, how can I help you today?"
+}
