@@ -16,6 +16,7 @@ function getCalendarClient() {
  * @param {{ customerName: string, phone: string, serviceType: string, startTime: string, durationMinutes: number }} params
  */
 export async function bookAppointment({ customerName, phone, serviceType, startTime, durationMinutes = 60 }) {
+  console.log('[calendar] GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
   const calendar = getCalendarClient();
   const start = chrono.parseDate(startTime) ?? new Date(startTime);
   const end = new Date(start.getTime() + durationMinutes * 60_000);
