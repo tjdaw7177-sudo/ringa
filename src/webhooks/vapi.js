@@ -32,6 +32,7 @@ vapiWebhookRouter.post('/', async (req, res) => {
         console.log('[vapi] tool result:', JSON.stringify(result));
       } catch (err) {
         console.error('[vapi] tool error:', err.message);
+        console.error('[vapi] tool error detail:', JSON.stringify({ code: err.code, status: err.status, response: err.response?.data }));
         result = { error: err.message };
       }
 
