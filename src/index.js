@@ -1,7 +1,11 @@
-import 'dotenv/config';
 import express from 'express';
 import { vapiWebhookRouter } from './webhooks/vapi.js';
 import { twilioWebhookRouter } from './webhooks/twilio.js';
+
+if (process.env.NODE_ENV !== 'production') {
+  const { default: dotenv } = await import('dotenv');
+  dotenv.config();
+}
 
 const app = express();
 app.use(express.json());
