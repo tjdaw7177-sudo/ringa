@@ -18,6 +18,8 @@ app.use('/webhooks/twilio', twilioWebhookRouter);
 const port = process.env.PORT ?? 3000;
 app.listen(port, () => {
   console.log(`Ringa listening on :${port}`);
+  const googleKeys = Object.keys(process.env).filter(k => k.startsWith('GOOGLE'));
+  console.log('[env] Google keys found:', googleKeys);
   console.log('[env] GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
   console.log('[env] VAPI_API_KEY set:', !!process.env.VAPI_API_KEY);
 });
