@@ -15,8 +15,9 @@ function getCalendarClient() {
  * Book an appointment on the business calendar.
  * @param {{ customerName: string, phone: string, serviceType: string, startTime: string, durationMinutes: number }} params
  */
-export async function bookAppointment({ customerName, phone, serviceType, startTime, durationMinutes = 60 }) {
+export async function bookAppointment({ customerName, phone, serviceType, address, startTime, durationMinutes = 60 }) {
   console.log('[calendar] GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
+  const { sendBookingConfirmation } = await import('./dispatch.js');
   const calendar = getCalendarClient();
   const start = chrono.parseDate(startTime) ?? new Date(startTime);
   const end = new Date(start.getTime() + durationMinutes * 60_000);
@@ -25,11 +26,14 @@ export async function bookAppointment({ customerName, phone, serviceType, startT
     calendarId: process.env.GOOGLE_CALENDAR_ID,
     requestBody: {
       summary: `${serviceType} — ${customerName}`,
-      description: `Customer phone: ${phone}`,
+      description: `Customer phone: ${phone}\nAddress: ${address ?? 'Not provided'}`,
+      location: address,
       start: { dateTime: start.toISOString(), timeZone: process.env.BUSINESS_TIMEZONE },
       end: { dateTime: end.toISOString(), timeZone: process.env.BUSINESS_TIMEZONE },
     },
   });
+
+  await sendBookingConfirmation({ to: `+1${phone.replace(/\D/g, '')}`, customerName, serviceType, startTime: start });
 
   return { success: true, eventId: event.data.id, htmlLink: event.data.htmlLink };
 }
