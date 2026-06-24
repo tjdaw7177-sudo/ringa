@@ -15,7 +15,9 @@ function getCalendarClient() {
  * Book an appointment on the business calendar.
  * @param {{ customerName: string, phone: string, serviceType: string, startTime: string, durationMinutes: number }} params
  */
-export async function bookAppointment({ customerName, phone, serviceType, address, startTime, durationMinutes = 60 }) {
+export async function bookAppointment({ customerName, CustomerName, phone, Phone, serviceType, address, startTime, durationMinutes = 60 }) {
+  customerName = customerName ?? CustomerName;
+  phone = phone ?? Phone;
   console.log('[calendar] GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
   const { sendBookingConfirmation } = await import('./dispatch.js');
   const calendar = getCalendarClient();
@@ -33,7 +35,11 @@ export async function bookAppointment({ customerName, phone, serviceType, addres
     },
   });
 
-  await sendBookingConfirmation({ to: `+1${phone.replace(/\D/g, '')}`, customerName, serviceType, startTime: start });
+  if (phone) {
+    const digits = phone.replace(/\D/g, '');
+    const to = digits.startsWith('1') ? `+${digits}` : `+1${digits}`;
+    await sendBookingConfirmation({ to, customerName, serviceType, startTime: start });
+  }
 
   return { success: true, eventId: event.data.id, htmlLink: event.data.htmlLink };
 }
