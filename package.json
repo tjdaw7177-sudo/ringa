@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
+    "leads": "node scripts/find-leads.js",
     "test": "node --test"
   },
   "dependencies": {
@@ -23,6 +24,6 @@
     "nodemon": "^3.1.0"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": "22.x"
   }
 }
