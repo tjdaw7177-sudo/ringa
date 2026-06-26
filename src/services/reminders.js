@@ -30,7 +30,7 @@ export function startReminderCron() {
     const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
     const in25h = new Date(now.getTime() + 25 * 60 * 60 * 1000);
 
-    for (const client of getAllClients()) {
+    for (const client of await getAllClients()) {
       try {
         const events = await getAppointmentsStartingBetween(in24h, in25h, client);
         for (const event of events) {
