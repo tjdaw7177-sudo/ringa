@@ -28,6 +28,9 @@ export async function bookAppointment({ customerName, CustomerName, phone, Phone
   const tzMs = new Date(now.toLocaleString('en-US', { timeZone: timezone })).getTime();
   const tzOffsetMinutes = (tzMs - utcMs) / 60000;
   const start = chrono.parseDate(startTime, now, { timezone: tzOffsetMinutes }) ?? new Date(startTime);
+  console.log('[calendar] tzOffsetMinutes:', tzOffsetMinutes);
+  console.log('[calendar] parsed start UTC:', start.toISOString());
+  console.log('[calendar] parsed start Vancouver:', start.toLocaleString('en-US', { timeZone: timezone }));
 
   const hoursCheck = isWithinBusinessHours(start, timezone);
   if (!hoursCheck.available) {
