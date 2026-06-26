@@ -1,6 +1,7 @@
 import express from 'express';
 import { vapiWebhookRouter } from './webhooks/vapi.js';
 import { twilioWebhookRouter } from './webhooks/twilio.js';
+import { startReminderCron } from './services/reminders.js';
 
 if (process.env.NODE_ENV !== 'production') {
   const { default: dotenv } = await import('dotenv');
@@ -18,4 +19,5 @@ app.use('/webhooks/twilio', twilioWebhookRouter);
 const port = process.env.PORT ?? 3000;
 app.listen(port, () => {
   console.log(`Ringa listening on :${port}`);
+  startReminderCron();
 });

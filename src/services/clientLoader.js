@@ -35,3 +35,11 @@ const clients = loadAllClients();
 export function getClientByPhoneNumberId(phoneNumberId) {
   return clients[phoneNumberId] ?? null;
 }
+
+export function getClientByTwilioNumber(twilioNumber) {
+  return Object.values(clients).find(c => c.twilio.phoneNumber === twilioNumber) ?? null;
+}
+
+export function getAllClients() {
+  return Object.values(clients);
+}

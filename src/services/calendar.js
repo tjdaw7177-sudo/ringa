@@ -52,3 +52,38 @@ export async function bookAppointment({ customerName, CustomerName, phone, Phone
 
   return { success: true, eventId: event.data.id, htmlLink: event.data.htmlLink };
 }
+
+export async function getUpcomingAppointmentByPhone(phone, client) {
+  const calendar = getCalendarClient(client);
+  const now = new Date();
+  const future = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  const { data } = await calendar.events.list({
+    calendarId: client.google.calendarId,
+    timeMin: now.toISOString(),
+    timeMax: future.toISOString(),
+    singleEvents: true,
+    orderBy: 'startTime',
+  });
+
+  const digits = phone.replace(/\D/g, '');
+  return data.items?.find(e => e.description?.includes(digits)) ?? null;
+}
+
+export async function cancelAppointment(eventId, client) {
+  const calendar = getCalendarClient(client);
+  await calendar.events.delete({ calendarId: client.google.calendarId, eventId });
+  return { success: true };
+}
+
+export async function getAppointmentsStartingBetween(timeMin, timeMax, client) {
+  const calendar = getCalendarClient(client);
+  const { data } = await calendar.events.list({
+    calendarId: client.google.calendarId,
+    timeMin: timeMin.toISOString(),
+    timeMax: timeMax.toISOString(),
+    singleEvents: true,
+    orderBy: 'startTime',
+  });
+  return data.items ?? [];
+}
