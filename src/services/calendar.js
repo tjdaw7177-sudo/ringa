@@ -66,7 +66,7 @@ export async function getUpcomingAppointmentByPhone(phone, client) {
     orderBy: 'startTime',
   });
 
-  const digits = phone.replace(/\D/g, '');
+  const digits = phone.replace(/\D/g, '').replace(/^1/, '');
   return data.items?.find(e => e.description?.includes(digits)) ?? null;
 }
 
