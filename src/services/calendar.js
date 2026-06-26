@@ -19,7 +19,6 @@ function getCalendarClient() {
 export async function bookAppointment({ customerName, CustomerName, phone, Phone, serviceType, address, startTime, durationMinutes = 60 }) {
   customerName = customerName ?? CustomerName;
   phone = phone ?? Phone;
-  console.log('[calendar] GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
   const { sendBookingConfirmation } = await import('./dispatch.js');
   const calendar = getCalendarClient();
   const timezone = process.env.BUSINESS_TIMEZONE ?? 'America/Vancouver';
@@ -29,9 +28,6 @@ export async function bookAppointment({ customerName, CustomerName, phone, Phone
   const tzOffsetMinutes = (tzMs - utcMs) / 60000;
   const rawStart = chrono.parseDate(startTime, now) ?? new Date(startTime);
   const start = new Date(rawStart.getTime() - tzOffsetMinutes * 60000);
-  console.log('[calendar] tzOffsetMinutes:', tzOffsetMinutes);
-  console.log('[calendar] parsed start UTC:', start.toISOString());
-  console.log('[calendar] parsed start Vancouver:', start.toLocaleString('en-US', { timeZone: timezone }));
 
   const hoursCheck = isWithinBusinessHours(start, timezone);
   if (!hoursCheck.available) {
