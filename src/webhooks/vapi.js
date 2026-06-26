@@ -11,15 +11,10 @@ vapiWebhookRouter.post('/', async (req, res) => {
   console.log('[vapi] message type:', message?.type);
 
   if (message?.type === 'tool-calls') {
-    console.log('[vapi] full message keys:', JSON.stringify(Object.keys(message)));
-    console.log('[vapi] phoneNumberId candidates:', JSON.stringify({
-      phoneNumberId: message.phoneNumberId,
-      'call.phoneNumberId': message.call?.phoneNumberId,
-      'call.phoneNumber.id': message.call?.phoneNumber?.id,
-    }));
-    const client = getClientByPhoneNumberId(message.phoneNumberId);
+    const phoneNumberId = message.call?.phoneNumberId;
+    const client = getClientByPhoneNumberId(phoneNumberId);
     if (!client) {
-      console.error('[vapi] unknown phoneNumberId:', message.phoneNumberId);
+      console.error('[vapi] unknown phoneNumberId:', phoneNumberId);
       return res.status(400).json({ error: 'Unknown client' });
     }
 

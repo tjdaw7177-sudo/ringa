@@ -2,7 +2,7 @@
   "id": "client-001",
   "businessName": "Ringa Demo Plumbing",
   "timezone": "America/Vancouver",
-  "vapiPhoneNumberId": "0418faff-b68f-4aa6-a91f-627cad1f0ce4",
+  "vapiPhoneNumberId": "adb6bf08-36bb-4f00-878c-bf6350b0258e",
   "vapiAssistantId": "a23ab09f-156f-4f5c-9b82-b5185647b748",
   "emergencyDispatchNumber": "+12368822840",
   "businessHours": {
