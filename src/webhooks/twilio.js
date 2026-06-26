@@ -11,7 +11,7 @@ twilioWebhookRouter.post('/sms', async (req, res) => {
   const twiml = (msg) =>
     res.set('Content-Type', 'text/xml').send(`<Response><Message>${msg}</Message></Response>`);
 
-  const client = getClientByTwilioNumber(To);
+  const client = await getClientByTwilioNumber(To);
   if (!client) return res.set('Content-Type', 'text/xml').send('<Response/>');
 
   if (text === 'REMOVE') {

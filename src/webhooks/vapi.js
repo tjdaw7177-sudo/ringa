@@ -12,7 +12,7 @@ vapiWebhookRouter.post('/', async (req, res) => {
 
   if (message?.type === 'tool-calls') {
     const phoneNumberId = message.call?.phoneNumberId;
-    const client = getClientByPhoneNumberId(phoneNumberId);
+    const client = await getClientByPhoneNumberId(phoneNumberId);
     if (!client) {
       console.error('[vapi] unknown phoneNumberId:', phoneNumberId);
       return res.status(400).json({ error: 'Unknown client' });
