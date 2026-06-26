@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import * as chrono from 'chrono-node';
+import { isWithinBusinessHours } from '../utils/businessHours.js';
 
 function getCalendarClient() {
   const auth = new google.auth.OAuth2(
@@ -22,6 +23,11 @@ export async function bookAppointment({ customerName, CustomerName, phone, Phone
   const { sendBookingConfirmation } = await import('./dispatch.js');
   const calendar = getCalendarClient();
   const start = chrono.parseDate(startTime) ?? new Date(startTime);
+
+  const hoursCheck = isWithinBusinessHours(start, process.env.BUSINESS_TIMEZONE);
+  if (!hoursCheck.available) {
+    return { success: false, reason: hoursCheck.reason };
+  }
   const end = new Date(start.getTime() + durationMinutes * 60_000);
 
   const event = await calendar.events.insert({
