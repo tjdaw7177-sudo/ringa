@@ -22,6 +22,7 @@ app.listen(port, () => {
   console.log('[env] Google keys found:', googleKeys);
   console.log('[env] GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
   console.log('[env] BUSINESS_TIMEZONE:', JSON.stringify(process.env.BUSINESS_TIMEZONE));
+  console.log('[env] Twilio keys found:', Object.keys(process.env).filter(k => k.startsWith('TWILIO')));
   console.log('[env] TWILIO_ACCOUNT_SID set:', !!process.env.TWILIO_ACCOUNT_SID);
   console.log('[env] TWILIO_AUTH_TOKEN set:', !!process.env.TWILIO_AUTH_TOKEN);
   console.log('[env] TWILIO_PHONE_NUMBER:', process.env.TWILIO_PHONE_NUMBER);
