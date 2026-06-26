@@ -18,7 +18,7 @@ function sendReminder(client, event) {
   });
 
   return twilioClient.messages.create({
-    body: `Reminder: you have a ${client.businessName} appointment tomorrow — ${event.summary} at ${when}. Reply CANCEL to cancel or RESCHEDULE to change.`,
+    body: `Reminder: you have a ${client.businessName} appointment tomorrow — ${event.summary} at ${when}. Reply REMOVE to cancel or RESCHEDULE to change the time.`,
     from: client.twilio.phoneNumber,
     to,
   });

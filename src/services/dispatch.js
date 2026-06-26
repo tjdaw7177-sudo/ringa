@@ -26,7 +26,7 @@ export async function sendBookingConfirmation({ to, customerName, serviceType, s
   });
 
   await twilioClient.messages.create({
-    body: `Hi ${customerName}, your ${serviceType} appointment is confirmed for ${formatted}. Reply CANCEL to cancel.`,
+    body: `Hi ${customerName}, your ${serviceType} appointment is confirmed for ${formatted}. Reply REMOVE to cancel or RESCHEDULE to change the time.`,
     from: client.twilio.phoneNumber,
     to,
   });

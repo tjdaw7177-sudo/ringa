@@ -14,7 +14,7 @@ twilioWebhookRouter.post('/sms', async (req, res) => {
   const client = getClientByTwilioNumber(To);
   if (!client) return res.set('Content-Type', 'text/xml').send('<Response/>');
 
-  if (text === 'CANCEL') {
+  if (text === 'REMOVE') {
     const event = await getUpcomingAppointmentByPhone(From, client).catch(() => null);
     if (!event) return twiml("We couldn't find an upcoming appointment for your number. Call us if you need help.");
     await cancelAppointment(event.id, client);
