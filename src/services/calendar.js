@@ -23,8 +23,11 @@ export async function bookAppointment({ customerName, CustomerName, phone, Phone
   const { sendBookingConfirmation } = await import('./dispatch.js');
   const calendar = getCalendarClient();
   const timezone = process.env.BUSINESS_TIMEZONE ?? 'America/Vancouver';
-  const nowInTz = new Date(new Date().toLocaleString('en-US', { timeZone: timezone }));
-  const start = chrono.parseDate(startTime, nowInTz) ?? new Date(startTime);
+  const now = new Date();
+  const utcMs = now.getTime();
+  const tzMs = new Date(now.toLocaleString('en-US', { timeZone: timezone })).getTime();
+  const tzOffsetMinutes = (tzMs - utcMs) / 60000;
+  const start = chrono.parseDate(startTime, now, { timezone: tzOffsetMinutes }) ?? new Date(startTime);
 
   const hoursCheck = isWithinBusinessHours(start, timezone);
   if (!hoursCheck.available) {
