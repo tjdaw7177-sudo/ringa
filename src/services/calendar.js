@@ -27,7 +27,8 @@ export async function bookAppointment({ customerName, CustomerName, phone, Phone
   const utcMs = now.getTime();
   const tzMs = new Date(now.toLocaleString('en-US', { timeZone: timezone })).getTime();
   const tzOffsetMinutes = (tzMs - utcMs) / 60000;
-  const start = chrono.parseDate(startTime, now, { timezone: tzOffsetMinutes }) ?? new Date(startTime);
+  const rawStart = chrono.parseDate(startTime, now) ?? new Date(startTime);
+  const start = new Date(rawStart.getTime() - tzOffsetMinutes * 60000);
   console.log('[calendar] tzOffsetMinutes:', tzOffsetMinutes);
   console.log('[calendar] parsed start UTC:', start.toISOString());
   console.log('[calendar] parsed start Vancouver:', start.toLocaleString('en-US', { timeZone: timezone }));
