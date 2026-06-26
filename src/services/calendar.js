@@ -22,9 +22,11 @@ export async function bookAppointment({ customerName, CustomerName, phone, Phone
   console.log('[calendar] GOOGLE_CALENDAR_ID:', process.env.GOOGLE_CALENDAR_ID);
   const { sendBookingConfirmation } = await import('./dispatch.js');
   const calendar = getCalendarClient();
-  const start = chrono.parseDate(startTime) ?? new Date(startTime);
+  const timezone = process.env.BUSINESS_TIMEZONE ?? 'America/Vancouver';
+  const nowInTz = new Date(new Date().toLocaleString('en-US', { timeZone: timezone }));
+  const start = chrono.parseDate(startTime, nowInTz) ?? new Date(startTime);
 
-  const hoursCheck = isWithinBusinessHours(start, process.env.BUSINESS_TIMEZONE);
+  const hoursCheck = isWithinBusinessHours(start, timezone);
   if (!hoursCheck.available) {
     return { success: false, reason: hoursCheck.reason };
   }
