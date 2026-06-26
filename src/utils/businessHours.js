@@ -1,14 +1,15 @@
-const HOURS = {
-  0: null,                // Sunday — closed
-  1: { open: 8, close: 17 }, // Monday
-  2: { open: 8, close: 17 }, // Tuesday
-  3: { open: 8, close: 17 }, // Wednesday
-  4: { open: 8, close: 17 }, // Thursday
-  5: { open: 8, close: 17 }, // Friday
-  6: { open: 8, close: 12 }, // Saturday
+const DEFAULT_HOURS = {
+  0: null,
+  1: { open: 8, close: 17 },
+  2: { open: 8, close: 17 },
+  3: { open: 8, close: 17 },
+  4: { open: 8, close: 17 },
+  5: { open: 8, close: 17 },
+  6: { open: 8, close: 12 },
 };
 
-export function isWithinBusinessHours(date, timezone = 'America/Vancouver') {
+export function isWithinBusinessHours(date, timezone = 'America/Vancouver', hoursConfig) {
+  const HOURS = hoursConfig ?? DEFAULT_HOURS;
   const local = new Intl.DateTimeFormat('en-CA', {
     timeZone: timezone,
     hour: 'numeric',

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { bookAppointment } from '../services/calendar.js';
 import { dispatchEmergency } from '../services/dispatch.js';
+import { getClientByPhoneNumberId } from '../services/clientLoader.js';
 
 export const vapiWebhookRouter = Router();
 
@@ -10,6 +11,12 @@ vapiWebhookRouter.post('/', async (req, res) => {
   console.log('[vapi] message type:', message?.type);
 
   if (message?.type === 'tool-calls') {
+    const client = getClientByPhoneNumberId(message.phoneNumberId);
+    if (!client) {
+      console.error('[vapi] unknown phoneNumberId:', message.phoneNumberId);
+      return res.status(400).json({ error: 'Unknown client' });
+    }
+
     const results = [];
 
     for (const toolCall of message.toolCallList) {
@@ -23,9 +30,9 @@ vapiWebhookRouter.post('/', async (req, res) => {
       let result;
       try {
         if (name === 'bookappointment') {
-          result = await bookAppointment(parameters);
-        } else if (name === 'dispatchememergency' || name === 'dispatchemer gency' || name.startsWith('dispatch')) {
-          result = await dispatchEmergency(parameters);
+          result = await bookAppointment(parameters, client);
+        } else if (name.startsWith('dispatch')) {
+          result = await dispatchEmergency(parameters, client);
         } else {
           result = { error: `Unknown tool: ${name}` };
         }

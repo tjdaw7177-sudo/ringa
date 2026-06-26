@@ -2,26 +2,23 @@ import { google } from 'googleapis';
 import * as chrono from 'chrono-node';
 import { isWithinBusinessHours } from '../utils/businessHours.js';
 
-function getCalendarClient() {
+function getCalendarClient(client) {
   const auth = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
+    client.google.clientId,
+    client.google.clientSecret,
     process.env.GOOGLE_REDIRECT_URI,
   );
-  auth.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+  auth.setCredentials({ refresh_token: client.google.refreshToken });
   return google.calendar({ version: 'v3', auth });
 }
 
-/**
- * Book an appointment on the business calendar.
- * @param {{ customerName: string, phone: string, serviceType: string, startTime: string, durationMinutes: number }} params
- */
-export async function bookAppointment({ customerName, CustomerName, phone, Phone, serviceType, address, startTime, durationMinutes = 60 }) {
+export async function bookAppointment({ customerName, CustomerName, phone, Phone, serviceType, address, startTime, durationMinutes = 60 }, client) {
   customerName = customerName ?? CustomerName;
   phone = phone ?? Phone;
+
   const { sendBookingConfirmation } = await import('./dispatch.js');
-  const calendar = getCalendarClient();
-  const timezone = process.env.BUSINESS_TIMEZONE ?? 'America/Vancouver';
+  const calendar = getCalendarClient(client);
+  const timezone = client.timezone ?? 'America/Vancouver';
   const now = new Date();
   const utcMs = now.getTime();
   const tzMs = new Date(now.toLocaleString('en-US', { timeZone: timezone })).getTime();
@@ -29,44 +26,29 @@ export async function bookAppointment({ customerName, CustomerName, phone, Phone
   const rawStart = chrono.parseDate(startTime, now) ?? new Date(startTime);
   const start = new Date(rawStart.getTime() - tzOffsetMinutes * 60000);
 
-  const hoursCheck = isWithinBusinessHours(start, timezone);
+  const hoursCheck = isWithinBusinessHours(start, timezone, client.businessHours);
   if (!hoursCheck.available) {
     return { success: false, reason: hoursCheck.reason };
   }
+
   const end = new Date(start.getTime() + durationMinutes * 60_000);
 
   const event = await calendar.events.insert({
-    calendarId: process.env.GOOGLE_CALENDAR_ID,
+    calendarId: client.google.calendarId,
     requestBody: {
       summary: `${serviceType} — ${customerName}`,
       description: `Customer phone: ${phone}\nAddress: ${address ?? 'Not provided'}`,
       location: address,
-      start: { dateTime: start.toISOString(), timeZone: process.env.BUSINESS_TIMEZONE },
-      end: { dateTime: end.toISOString(), timeZone: process.env.BUSINESS_TIMEZONE },
+      start: { dateTime: start.toISOString(), timeZone: timezone },
+      end: { dateTime: end.toISOString(), timeZone: timezone },
     },
   });
 
   if (phone) {
     const digits = phone.replace(/\D/g, '');
     const to = digits.startsWith('1') ? `+${digits}` : `+1${digits}`;
-    await sendBookingConfirmation({ to, customerName, serviceType, startTime: start });
+    await sendBookingConfirmation({ to, customerName, serviceType, startTime: start, client });
   }
 
   return { success: true, eventId: event.data.id, htmlLink: event.data.htmlLink };
-}
-
-export async function getAvailableSlots(date) {
-  const calendar = getCalendarClient();
-  const dayStart = new Date(`${date}T00:00:00`);
-  const dayEnd = new Date(`${date}T23:59:59`);
-
-  const { data } = await calendar.freebusy.query({
-    requestBody: {
-      timeMin: dayStart.toISOString(),
-      timeMax: dayEnd.toISOString(),
-      items: [{ id: process.env.GOOGLE_CALENDAR_ID }],
-    },
-  });
-
-  return data.calendars[process.env.GOOGLE_CALENDAR_ID].busy;
 }
