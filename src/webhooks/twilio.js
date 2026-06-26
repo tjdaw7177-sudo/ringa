@@ -15,9 +15,7 @@ twilioWebhookRouter.post('/sms', async (req, res) => {
   if (!client) return res.set('Content-Type', 'text/xml').send('<Response/>');
 
   if (text === 'REMOVE') {
-    console.log('[sms] REMOVE from:', From);
-    const event = await getUpcomingAppointmentByPhone(From, client).catch((err) => { console.error('[sms] lookup error:', err.message); return null; });
-    console.log('[sms] found event:', event?.summary, '| description:', event?.description);
+    const event = await getUpcomingAppointmentByPhone(From, client).catch(() => null);
     if (!event) return twiml("We couldn't find an upcoming appointment for your number. Call us if you need help.");
     await cancelAppointment(event.id, client);
     return twiml(`Your appointment "${event.summary}" has been cancelled. Call us to rebook anytime.`);
