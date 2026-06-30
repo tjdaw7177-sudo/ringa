@@ -83,71 +83,94 @@ onboardRouter.get('/', (req, res) => {
 
 // Step 2 — save form data, redirect to Google OAuth
 onboardRouter.post('/submit', async (req, res) => {
-  const { businessName, email, emergencyNumber, timezone, calendarId } = req.body;
-  const clientId = `client-${uuidv4().slice(0, 8)}`;
+  try {
+    const { businessName, email, emergencyNumber, timezone, calendarId } = req.body;
+    console.log('[onboard] submit:', { businessName, email, timezone });
 
-  await sql`
-    INSERT INTO clients (id, business_name, timezone, emergency_number, business_hours, google_calendar_id, status)
-    VALUES (${clientId}, ${businessName}, ${timezone}, ${emergencyNumber}, ${JSON.stringify(DEFAULT_HOURS)}, ${calendarId}, 'pending')
-  `;
+    const clientId = `client-${uuidv4().slice(0, 8)}`;
 
-  const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    `${process.env.APP_URL}/onboard/google/callback`,
-  );
+    await sql`
+      INSERT INTO clients (id, business_name, timezone, emergency_number, business_hours, google_calendar_id, status)
+      VALUES (
+        ${clientId},
+        ${businessName},
+        ${timezone},
+        ${emergencyNumber},
+        ${sql.json(DEFAULT_HOURS)},
+        ${calendarId},
+        'pending'
+      )
+    `;
+    console.log('[onboard] client row created:', clientId);
 
-  const authUrl = oauth2Client.generateAuthUrl({
-    access_type: 'offline',
-    prompt: 'consent',
-    scope: ['https://www.googleapis.com/auth/calendar'],
-    state: clientId,
-  });
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      `${process.env.APP_URL}/onboard/google/callback`,
+    );
 
-  res.redirect(authUrl);
+    const authUrl = oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      prompt: 'consent',
+      scope: ['https://www.googleapis.com/auth/calendar'],
+      state: clientId,
+    });
+
+    res.redirect(authUrl);
+  } catch (err) {
+    console.error('[onboard] submit error:', err);
+    res.status(500).send(`<pre>Onboarding error: ${err.message}</pre>`);
+  }
 });
 
 // Step 3 — Google OAuth callback, provision Twilio + Vapi
 onboardRouter.get('/google/callback', async (req, res) => {
-  const { code, state: clientId } = req.query;
+  try {
+    const { code, state: clientId } = req.query;
+    console.log('[onboard] google callback for client:', clientId);
 
-  const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    `${process.env.APP_URL}/onboard/google/callback`,
-  );
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      `${process.env.APP_URL}/onboard/google/callback`,
+    );
 
-  const { tokens } = await oauth2Client.getToken(code);
-  const refreshToken = tokens.refresh_token;
+    const { tokens } = await oauth2Client.getToken(code);
+    const refreshToken = tokens.refresh_token;
+    console.log('[onboard] got refresh token:', !!refreshToken);
 
-  // Buy a Twilio phone number
-  const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-  const [client] = await sql`SELECT * FROM clients WHERE id = ${clientId}`;
+    const [client] = await sql`SELECT * FROM clients WHERE id = ${clientId}`;
+    console.log('[onboard] loaded client:', client?.business_name);
 
-  const numbers = await twilioClient.availablePhoneNumbers('CA').local.list({
-    areaCode: 604,
-    limit: 1,
-  });
-  const purchased = await twilioClient.incomingPhoneNumbers.create({
-    phoneNumber: numbers[0]?.phoneNumber,
-    smsUrl: `${process.env.APP_URL}/webhooks/twilio/sms`,
-  });
+    // Buy a Twilio phone number
+    const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    const numbers = await twilioClient.availablePhoneNumbers('CA').local.list({
+      areaCode: 604,
+      limit: 1,
+    });
+    if (!numbers.length) throw new Error('No 604 numbers available');
 
-  // Create Vapi assistant
-  const vapiRes = await fetch('https://api.vapi.ai/assistant', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.VAPI_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      name: `${client.business_name} Receptionist`,
-      model: {
-        provider: 'anthropic',
-        model: 'claude-sonnet-4-6',
-        messages: [{
-          role: 'system',
-          content: `You are the friendly AI receptionist for ${client.business_name}, a plumbing and HVAC company. Your job is to:
+    const purchased = await twilioClient.incomingPhoneNumbers.create({
+      phoneNumber: numbers[0].phoneNumber,
+      smsUrl: `${process.env.APP_URL}/webhooks/twilio/sms`,
+    });
+    console.log('[onboard] purchased Twilio number:', purchased.phoneNumber);
+
+    // Create Vapi assistant
+    const vapiRes = await fetch('https://api.vapi.ai/assistant', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.VAPI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: `${client.business_name} Receptionist`,
+        model: {
+          provider: 'anthropic',
+          model: 'claude-sonnet-4-6',
+          messages: [{
+            role: 'system',
+            content: `You are the friendly AI receptionist for ${client.business_name}, a plumbing and HVAC company. Your job is to:
 1. Greet callers warmly and understand their need
 2. Determine if this is an EMERGENCY (no heat, gas leak, flooding) or a routine appointment
 3. For emergencies: collect name, address, and issue, then call dispatchEmergency
@@ -155,81 +178,85 @@ onboardRouter.get('/google/callback', async (req, res) => {
 5. Confirm all details back before executing any function
 
 Always be calm, professional, and empathetic.`,
-        }],
-        tools: [
-          {
-            type: 'function',
-            function: {
-              name: 'bookAppointment',
-              description: 'Book a service appointment on the business calendar',
-              parameters: {
-                type: 'object',
-                properties: {
-                  CustomerName: { type: 'string' },
-                  Phone: { type: 'string' },
-                  serviceType: { type: 'string' },
-                  address: { type: 'string' },
-                  startTime: { type: 'string' },
+          }],
+          tools: [
+            {
+              type: 'function',
+              function: {
+                name: 'bookAppointment',
+                description: 'Book a service appointment on the business calendar',
+                parameters: {
+                  type: 'object',
+                  properties: {
+                    CustomerName: { type: 'string' },
+                    Phone: { type: 'string' },
+                    serviceType: { type: 'string' },
+                    address: { type: 'string' },
+                    startTime: { type: 'string' },
+                  },
+                  required: ['CustomerName', 'Phone', 'serviceType', 'address', 'startTime'],
                 },
-                required: ['CustomerName', 'Phone', 'serviceType', 'address', 'startTime'],
               },
             },
-          },
-          {
-            type: 'function',
-            function: {
-              name: 'dispatchEmergency',
-              description: 'Alert the on-call technician for an emergency',
-              parameters: {
-                type: 'object',
-                properties: {
-                  customerName: { type: 'string' },
-                  phone: { type: 'string' },
-                  address: { type: 'string' },
-                  issue: { type: 'string' },
+            {
+              type: 'function',
+              function: {
+                name: 'dispatchEmergency',
+                description: 'Alert the on-call technician for an emergency',
+                parameters: {
+                  type: 'object',
+                  properties: {
+                    customerName: { type: 'string' },
+                    phone: { type: 'string' },
+                    address: { type: 'string' },
+                    issue: { type: 'string' },
+                  },
+                  required: ['customerName', 'phone', 'address', 'issue'],
                 },
-                required: ['customerName', 'phone', 'address', 'issue'],
               },
             },
-          },
-        ],
+          ],
+        },
+        voice: { provider: '11labs', voiceId: 'sarah' },
+        firstMessage: `Thank you for calling ${client.business_name}! How can I help you today?`,
+        serverUrl: `${process.env.APP_URL}/webhooks/vapi`,
+      }),
+    });
+    const vapiAssistant = await vapiRes.json();
+    console.log('[onboard] created Vapi assistant:', vapiAssistant.id);
+    if (!vapiAssistant.id) throw new Error(`Vapi assistant creation failed: ${JSON.stringify(vapiAssistant)}`);
+
+    // Import the Twilio number into Vapi and link the assistant
+    const vapiImportRes = await fetch('https://api.vapi.ai/phone-number', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.VAPI_API_KEY}`,
+        'Content-Type': 'application/json',
       },
-      voice: { provider: '11labs', voiceId: 'sarah' },
-      firstMessage: `Thank you for calling ${client.business_name}! How can I help you today?`,
-      serverUrl: `${process.env.APP_URL}/webhooks/vapi`,
-    }),
-  });
-  const vapiAssistant = await vapiRes.json();
+      body: JSON.stringify({
+        provider: 'twilio',
+        number: purchased.phoneNumber,
+        twilioAccountSid: process.env.TWILIO_ACCOUNT_SID,
+        twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
+        assistantId: vapiAssistant.id,
+      }),
+    });
+    const vapiPhone = await vapiImportRes.json();
+    console.log('[onboard] imported phone into Vapi:', vapiPhone.id);
 
-  // Assign phone number to Vapi assistant
-  await fetch(`https://api.vapi.ai/phone-number/${purchased.sid}`, {
-    method: 'PATCH',
-    headers: {
-      'Authorization': `Bearer ${process.env.VAPI_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ assistantId: vapiAssistant.id }),
-  });
+    // Save everything to DB
+    await sql`
+      UPDATE clients SET
+        google_refresh_token = ${refreshToken},
+        twilio_phone_number = ${purchased.phoneNumber},
+        vapi_assistant_id = ${vapiAssistant.id},
+        vapi_phone_number_id = ${vapiPhone.id},
+        status = 'active'
+      WHERE id = ${clientId}
+    `;
+    console.log('[onboard] client activated:', clientId);
 
-  // Get Vapi phone number ID
-  const vapiPhoneRes = await fetch(`https://api.vapi.ai/phone-number?twilioPhoneNumber=${purchased.phoneNumber}`, {
-    headers: { 'Authorization': `Bearer ${process.env.VAPI_API_KEY}` },
-  });
-  const vapiPhones = await vapiPhoneRes.json();
-  const vapiPhoneNumberId = vapiPhones[0]?.id;
-
-  // Save everything to DB
-  await sql`
-    UPDATE clients SET
-      google_refresh_token = ${refreshToken},
-      twilio_phone_number = ${purchased.phoneNumber},
-      vapi_assistant_id = ${vapiAssistant.id},
-      vapi_phone_number_id = ${vapiPhoneNumberId},
-      status = 'active'
-    WHERE id = ${clientId}
-  `;
-
-  res.send(`<!DOCTYPE html>
+    res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -254,4 +281,8 @@ Always be calm, professional, and empathetic.`,
   </div>
 </body>
 </html>`);
+  } catch (err) {
+    console.error('[onboard] callback error:', err);
+    res.status(500).send(`<pre>Provisioning error: ${err.message}</pre>`);
+  }
 });
