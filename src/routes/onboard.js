@@ -66,9 +66,9 @@ onboardRouter.get('/', (req, res) => {
 
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Google Calendar ID</label>
-        <input name="calendarId" required placeholder="you@gmail.com"
+        <input name="calendarId" id="calendarId" required placeholder="you@gmail.com"
           class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <p class="text-xs text-gray-400 mt-1">Found in Google Calendar → Settings → Integrate calendar</p>
+        <p class="text-xs text-gray-400 mt-1">Usually just your Gmail address (e.g. you@gmail.com). Found in Google Calendar → Settings → Integrate calendar → Calendar ID</p>
       </div>
 
       <button type="submit"
@@ -84,8 +84,11 @@ onboardRouter.get('/', (req, res) => {
 // Step 2 — save form data, redirect to Google OAuth
 onboardRouter.post('/submit', async (req, res) => {
   try {
-    const { businessName, email, emergencyNumber, timezone, calendarId } = req.body;
-    console.log('[onboard] submit:', { businessName, email, timezone });
+    let { businessName, email, emergencyNumber, timezone, calendarId } = req.body;
+    // If someone pastes the Google Calendar embed/public URL, extract just the email
+    const srcMatch = calendarId?.match(/[?&]src=([^&]+)/);
+    if (srcMatch) calendarId = decodeURIComponent(srcMatch[1]);
+    console.log('[onboard] submit:', { businessName, email, timezone, calendarId });
 
     const clientId = `client-${uuidv4().slice(0, 8)}`;
 
