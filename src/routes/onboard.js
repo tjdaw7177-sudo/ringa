@@ -1,8 +1,11 @@
 import { Router } from 'express';
 import { google } from 'googleapis';
 import { v4 as uuidv4 } from 'uuid';
+import Stripe from 'stripe';
 import sql from '../db/index.js';
 import twilio from 'twilio';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const onboardRouter = Router();
 
@@ -81,11 +84,10 @@ onboardRouter.get('/', (req, res) => {
 </html>`);
 });
 
-// Step 2 — save form data, redirect to Google OAuth
+// Step 2 — save form data, redirect to Stripe Checkout
 onboardRouter.post('/submit', async (req, res) => {
   try {
     let { businessName, email, emergencyNumber, timezone, calendarId } = req.body;
-    // If someone pastes the Google Calendar embed/public URL, extract just the email
     const srcMatch = calendarId?.match(/[?&]src=([^&]+)/);
     if (srcMatch) calendarId = decodeURIComponent(srcMatch[1]);
     console.log('[onboard] submit:', { businessName, email, timezone, calendarId });
@@ -106,6 +108,37 @@ onboardRouter.post('/submit', async (req, res) => {
     `;
     console.log('[onboard] client row created:', clientId);
 
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      customer_email: email,
+      line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
+      metadata: { clientId },
+      success_url: `${process.env.APP_URL}/onboard/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.APP_URL}/onboard`,
+    });
+
+    res.redirect(session.url);
+  } catch (err) {
+    console.error('[onboard] submit error:', err);
+    res.status(500).send(`<pre>Onboarding error: ${err.message}</pre>`);
+  }
+});
+
+// Step 3 — Stripe payment confirmed, redirect to Google OAuth
+onboardRouter.get('/payment-success', async (req, res) => {
+  try {
+    const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
+    const clientId = session.metadata?.clientId;
+    if (!clientId) throw new Error('Missing clientId in Stripe session metadata');
+
+    await sql`
+      UPDATE clients SET
+        stripe_customer_id = ${session.customer},
+        stripe_subscription_id = ${session.subscription}
+      WHERE id = ${clientId}
+    `;
+    console.log('[onboard] payment confirmed for:', clientId);
+
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
@@ -121,8 +154,8 @@ onboardRouter.post('/submit', async (req, res) => {
 
     res.redirect(authUrl);
   } catch (err) {
-    console.error('[onboard] submit error:', err);
-    res.status(500).send(`<pre>Onboarding error: ${err.message}</pre>`);
+    console.error('[onboard] payment-success error:', err);
+    res.status(500).send(`<pre>Error: ${err.message}</pre>`);
   }
 });
 

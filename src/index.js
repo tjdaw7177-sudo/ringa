@@ -1,6 +1,7 @@
 import express from 'express';
 import { vapiWebhookRouter } from './webhooks/vapi.js';
 import { twilioWebhookRouter } from './webhooks/twilio.js';
+import { stripeWebhookRouter } from './webhooks/stripe.js';
 import { onboardRouter } from './routes/onboard.js';
 import { startReminderCron } from './services/reminders.js';
 
@@ -10,6 +11,10 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const app = express();
+
+// Stripe needs raw body to verify webhook signatures — mount before express.json()
+app.use('/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhookRouter);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
