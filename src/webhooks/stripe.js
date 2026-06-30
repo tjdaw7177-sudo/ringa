@@ -4,9 +4,8 @@ import sql from '../db/index.js';
 
 export const stripeWebhookRouter = Router();
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 stripeWebhookRouter.post('/', async (req, res) => {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const sig = req.headers['stripe-signature'];
   let event;
 

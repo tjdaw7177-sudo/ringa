@@ -5,7 +5,6 @@ import Stripe from 'stripe';
 import sql from '../db/index.js';
 import twilio from 'twilio';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const onboardRouter = Router();
 
@@ -160,6 +159,7 @@ onboardRouter.post('/submit', async (req, res) => {
       return res.status(400).send('Invalid plan selected.');
     }
 
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     console.log('[onboard] submit:', { businessName, email, timezone, calendarId, priceId });
 
     const clientId = `client-${uuidv4().slice(0, 8)}`;
@@ -197,6 +197,7 @@ onboardRouter.post('/submit', async (req, res) => {
 // Step 3 — Stripe payment confirmed, redirect to Google OAuth
 onboardRouter.get('/payment-success', async (req, res) => {
   try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
     const clientId = session.metadata?.clientId;
     if (!clientId) throw new Error('Missing clientId in Stripe session metadata');
