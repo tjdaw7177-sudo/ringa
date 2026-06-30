@@ -248,13 +248,15 @@ onboardRouter.get('/google/callback', async (req, res) => {
     const [client] = await sql`SELECT * FROM clients WHERE id = ${clientId}`;
     console.log('[onboard] loaded client:', client?.business_name);
 
-    // Buy a Twilio phone number
+    // Buy a Twilio phone number — try BC area codes in order
     const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-    const numbers = await twilioClient.availablePhoneNumbers('CA').local.list({
-      areaCode: 604,
-      limit: 1,
-    });
-    if (!numbers.length) throw new Error('No 604 numbers available');
+    const areaCodes = [604, 778, 236, 250];
+    let numbers = [];
+    for (const areaCode of areaCodes) {
+      numbers = await twilioClient.availablePhoneNumbers('CA').local.list({ areaCode, limit: 1 });
+      if (numbers.length) { console.log('[onboard] found number in area code:', areaCode); break; }
+    }
+    if (!numbers.length) throw new Error('No Canadian numbers available in 604/778/236/250');
 
     const purchased = await twilioClient.incomingPhoneNumbers.create({
       phoneNumber: numbers[0].phoneNumber,
