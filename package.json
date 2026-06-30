@@ -20,6 +20,7 @@
     "open": "^11.0.0",
     "postgres": "^3.4.9",
     "twilio": "^5.0.0",
+    "uuid": "^14.0.1",
     "zod": "^3.23.0"
   },
   "devDependencies": {

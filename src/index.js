@@ -1,6 +1,7 @@
 import express from 'express';
 import { vapiWebhookRouter } from './webhooks/vapi.js';
 import { twilioWebhookRouter } from './webhooks/twilio.js';
+import { onboardRouter } from './routes/onboard.js';
 import { startReminderCron } from './services/reminders.js';
 
 if (process.env.NODE_ENV !== 'production') {
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 app.use('/webhooks/vapi', vapiWebhookRouter);
 app.use('/webhooks/twilio', twilioWebhookRouter);
+app.use('/onboard', onboardRouter);
 
 const port = process.env.PORT ?? 3000;
 app.listen(port, () => {
