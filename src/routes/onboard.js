@@ -194,6 +194,95 @@ onboardRouter.post('/submit', async (req, res) => {
   }
 });
 
+// Owner bypass — skip Stripe, go straight to Google OAuth
+onboardRouter.post('/submit-direct', async (req, res) => {
+  try {
+    if (req.body.ownerSecret !== process.env.OWNER_SECRET) {
+      return res.status(403).send('Forbidden');
+    }
+    let { businessName, email, emergencyNumber, timezone, calendarId } = req.body;
+    const srcMatch = calendarId?.match(/[?&]src=([^&]+)/);
+    if (srcMatch) calendarId = decodeURIComponent(srcMatch[1]);
+
+    const clientId = `client-${uuidv4().slice(0, 8)}`;
+    await sql`
+      INSERT INTO clients (id, business_name, timezone, emergency_number, business_hours, google_calendar_id, status)
+      VALUES (
+        ${clientId}, ${businessName}, ${timezone}, ${emergencyNumber},
+        ${sql.json(DEFAULT_HOURS)}, ${calendarId}, 'pending'
+      )
+    `;
+
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      `${process.env.APP_URL}/onboard/google/callback`,
+    );
+    const authUrl = oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      prompt: 'consent',
+      scope: ['https://www.googleapis.com/auth/calendar'],
+      state: clientId,
+    });
+    res.redirect(authUrl);
+  } catch (err) {
+    console.error('[onboard] submit-direct error:', err);
+    res.status(500).send(`<pre>${err.message}</pre>`);
+  }
+});
+
+onboardRouter.get('/owner', (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ringa — Owner Setup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-lg">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Owner Setup (No Payment)</h1>
+    <form action="/onboard/submit-direct" method="POST" class="space-y-4">
+      <input type="hidden" name="ownerSecret" value="${req.query.secret ?? ''}">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+        <input name="businessName" required placeholder="Smith Plumbing & HVAC"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <input name="email" type="email" required placeholder="you@example.com"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Emergency Number</label>
+        <input name="emergencyNumber" type="tel" required placeholder="+17785551234"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Timezone</label>
+        <select name="timezone" class="w-full border border-gray-300 rounded-lg px-4 py-2.5">
+          <option value="America/Vancouver">Pacific Time</option>
+          <option value="America/Edmonton">Mountain Time</option>
+          <option value="America/Winnipeg">Central Time</option>
+          <option value="America/Toronto">Eastern Time</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Google Calendar ID</label>
+        <input name="calendarId" required placeholder="you@gmail.com"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <button type="submit"
+        class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 rounded-lg">
+        Create Client → Connect Google Calendar
+      </button>
+    </form>
+  </div>
+</body>
+</html>`);
+});
+
 // Step 3 — Stripe payment confirmed, redirect to Google OAuth
 onboardRouter.get('/payment-success', async (req, res) => {
   try {
