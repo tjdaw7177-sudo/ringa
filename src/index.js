@@ -3,6 +3,7 @@ import { vapiWebhookRouter } from './webhooks/vapi.js';
 import { twilioWebhookRouter } from './webhooks/twilio.js';
 import { stripeWebhookRouter } from './webhooks/stripe.js';
 import { onboardRouter } from './routes/onboard.js';
+import { landingRouter } from './routes/landing.js';
 import { startReminderCron } from './services/reminders.js';
 
 if (process.env.NODE_ENV !== 'production') {
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+app.use('/', landingRouter);
 app.use('/webhooks/vapi', vapiWebhookRouter);
 app.use('/webhooks/twilio', twilioWebhookRouter);
 app.use('/onboard', onboardRouter);
