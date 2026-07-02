@@ -145,6 +145,12 @@ adminRouter.get('/', requireOwner, async (req, res) => {
                       Activate
                     </button>
                   </form>` : ''}
+                  <form method="POST" action="/admin/delete?secret=${secret}" onsubmit="return confirm('Permanently delete ${c.business_name}? This cannot be undone.')">
+                    <input type="hidden" name="clientId" value="${c.id}">
+                    <button type="submit" class="text-xs bg-zinc-800 hover:bg-red-900 text-zinc-500 hover:text-red-400 border border-zinc-700 hover:border-red-800 px-3 py-1.5 rounded-lg transition-colors">
+                      Delete
+                    </button>
+                  </form>
                 </div>
               </td>
             </tr>`).join('')}
@@ -175,5 +181,12 @@ adminRouter.post('/activate', requireOwner, async (req, res) => {
   const { clientId } = req.body;
   await sql`UPDATE clients SET status = 'active' WHERE id = ${clientId}`;
   console.log('[admin] activated client:', clientId);
+  res.redirect(`/admin?secret=${req.query.secret}`);
+});
+
+adminRouter.post('/delete', requireOwner, async (req, res) => {
+  const { clientId } = req.body;
+  await sql`DELETE FROM clients WHERE id = ${clientId}`;
+  console.log('[admin] deleted client:', clientId);
   res.redirect(`/admin?secret=${req.query.secret}`);
 });
