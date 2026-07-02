@@ -21,11 +21,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
-app.use('/', landingRouter);
 app.use('/webhooks/vapi', vapiWebhookRouter);
 app.use('/webhooks/twilio', twilioWebhookRouter);
 app.use('/onboard', onboardRouter);
 app.use('/admin', adminRouter);
+app.use('/', landingRouter);
 
 const port = process.env.PORT ?? 3000;
 app.listen(port, () => {
