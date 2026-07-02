@@ -163,9 +163,10 @@ onboardRouter.post('/submit', async (req, res) => {
     console.log('[onboard] submit:', { businessName, email, timezone, calendarId, priceId });
 
     const clientId = `client-${uuidv4().slice(0, 8)}`;
+    const portalToken = uuidv4();
 
     await sql`
-      INSERT INTO clients (id, business_name, timezone, emergency_number, business_hours, google_calendar_id, status)
+      INSERT INTO clients (id, business_name, timezone, emergency_number, business_hours, google_calendar_id, email, portal_token, status)
       VALUES (
         ${clientId},
         ${businessName},
@@ -173,6 +174,8 @@ onboardRouter.post('/submit', async (req, res) => {
         ${emergencyNumber},
         ${sql.json(DEFAULT_HOURS)},
         ${calendarId},
+        ${email},
+        ${portalToken},
         'pending'
       )
     `;
@@ -205,11 +208,12 @@ onboardRouter.post('/submit-direct', async (req, res) => {
     if (srcMatch) calendarId = decodeURIComponent(srcMatch[1]);
 
     const clientId = `client-${uuidv4().slice(0, 8)}`;
+    const portalToken = uuidv4();
     await sql`
-      INSERT INTO clients (id, business_name, timezone, emergency_number, business_hours, google_calendar_id, status)
+      INSERT INTO clients (id, business_name, timezone, emergency_number, business_hours, google_calendar_id, email, portal_token, status)
       VALUES (
         ${clientId}, ${businessName}, ${timezone}, ${emergencyNumber},
-        ${sql.json(DEFAULT_HOURS)}, ${calendarId}, 'pending'
+        ${sql.json(DEFAULT_HOURS)}, ${calendarId}, ${email ?? null}, ${portalToken}, 'pending'
       )
     `;
 

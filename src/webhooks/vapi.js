@@ -1,7 +1,9 @@
 import { Router } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 import { bookAppointment } from '../services/calendar.js';
 import { dispatchEmergency } from '../services/dispatch.js';
 import { getClientByPhoneNumberId } from '../services/clientLoader.js';
+import sql from '../db/index.js';
 
 export const vapiWebhookRouter = Router();
 
@@ -9,6 +11,27 @@ vapiWebhookRouter.post('/', async (req, res) => {
   const { message } = req.body;
 
   console.log('[vapi] message type:', message?.type);
+
+  if (message?.type === 'end-of-call-report') {
+    const phoneNumberId = message.call?.phoneNumberId;
+    const client = await getClientByPhoneNumberId(phoneNumberId);
+    if (client) {
+      await sql`
+        INSERT INTO call_logs (id, client_id, vapi_call_id, transcript, summary, duration_seconds, caller_number)
+        VALUES (
+          ${uuidv4()},
+          ${client.id},
+          ${message.call?.id ?? null},
+          ${message.transcript ?? null},
+          ${message.summary ?? null},
+          ${message.durationSeconds ?? null},
+          ${message.call?.customer?.number ?? null}
+        )
+      `;
+      console.log('[vapi] call log saved for:', client.businessName);
+    }
+    return res.sendStatus(200);
+  }
 
   if (message?.type === 'tool-calls') {
     const phoneNumberId = message.call?.phoneNumberId;
