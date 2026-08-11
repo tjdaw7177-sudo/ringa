@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import sql from '../db/index.js';
+import { portalWelcomeEmail } from '../services/email.js';
 
 export const adminRouter = Router();
 
@@ -182,6 +183,15 @@ adminRouter.post('/activate', requireOwner, async (req, res) => {
   await sql`UPDATE clients SET status = 'active' WHERE id = ${clientId}`;
   console.log('[admin] activated client:', clientId);
   res.redirect(`/admin?secret=${req.query.secret}`);
+});
+
+adminRouter.get('/email-preview', requireOwner, (req, res) => {
+  const { html } = portalWelcomeEmail({
+    businessName: 'Smith Plumbing & HVAC',
+    portalUrl: `${process.env.APP_URL}/portal/login`,
+    ringaNumber: '+1 (604) 555-0123',
+  });
+  res.send(html);
 });
 
 adminRouter.post('/delete', requireOwner, async (req, res) => {
