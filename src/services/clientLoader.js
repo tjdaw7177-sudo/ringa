@@ -1,5 +1,7 @@
 import sql from '../db/index.js';
 
+export const TIER_LIMITS = { starter: 1, professional: 3, enterprise: 5 };
+
 function rowToClient(row) {
   return {
     id: row.id,
@@ -7,6 +9,8 @@ function rowToClient(row) {
     timezone: row.timezone,
     emergencyDispatchNumber: row.emergency_number,
     businessHours: row.business_hours,
+    tier: row.tier ?? 'starter',
+    // These come from the joined phone_numbers row when looking up by number
     vapiPhoneNumberId: row.vapi_phone_number_id,
     vapiAssistantId: row.vapi_assistant_id,
     twilio: {
@@ -25,36 +29,35 @@ function rowToClient(row) {
 
 export async function getClientByPhoneNumberId(phoneNumberId) {
   const rows = await sql`
-    SELECT * FROM clients WHERE vapi_phone_number_id = ${phoneNumberId} AND status = 'active'
+    SELECT c.*, pn.twilio_phone_number, pn.vapi_phone_number_id, pn.vapi_assistant_id
+    FROM clients c
+    JOIN phone_numbers pn ON pn.client_id = c.id
+    WHERE pn.vapi_phone_number_id = ${phoneNumberId}
+    AND c.status = 'active'
+    LIMIT 1
   `;
   return rows[0] ? rowToClient(rows[0]) : null;
 }
 
 export async function getClientByTwilioNumber(twilioNumber) {
   const rows = await sql`
-    SELECT * FROM clients WHERE twilio_phone_number = ${twilioNumber} AND status = 'active'
+    SELECT c.*, pn.twilio_phone_number, pn.vapi_phone_number_id, pn.vapi_assistant_id
+    FROM clients c
+    JOIN phone_numbers pn ON pn.client_id = c.id
+    WHERE pn.twilio_phone_number = ${twilioNumber}
+    AND c.status = 'active'
+    LIMIT 1
   `;
   return rows[0] ? rowToClient(rows[0]) : null;
 }
 
 export async function getAllClients() {
-  const rows = await sql`SELECT * FROM clients WHERE status = 'active'`;
-  return rows.map(rowToClient);
-}
-
-export async function createClient(data) {
-  const id = `client-${Date.now()}`;
-  await sql`
-    INSERT INTO clients (
-      id, business_name, timezone, emergency_number, business_hours,
-      vapi_phone_number_id, vapi_assistant_id, twilio_phone_number,
-      google_calendar_id, google_refresh_token, status
-    ) VALUES (
-      ${id}, ${data.businessName}, ${data.timezone}, ${data.emergencyNumber},
-      ${JSON.stringify(data.businessHours)}, ${data.vapiPhoneNumberId},
-      ${data.vapiAssistantId}, ${data.twilioPhoneNumber},
-      ${data.googleCalendarId}, ${data.googleRefreshToken}, 'active'
-    )
+  // For reminders: return one client entry per phone number
+  const rows = await sql`
+    SELECT c.*, pn.twilio_phone_number, pn.vapi_phone_number_id, pn.vapi_assistant_id
+    FROM clients c
+    JOIN phone_numbers pn ON pn.client_id = c.id
+    WHERE c.status = 'active'
   `;
-  return id;
+  return rows.map(rowToClient);
 }

@@ -5,9 +5,15 @@ import Stripe from 'stripe';
 import sql from '../db/index.js';
 import twilio from 'twilio';
 import { sendPortalWelcome } from '../services/email.js';
-
+import { TIER_LIMITS } from '../services/clientLoader.js';
 
 export const onboardRouter = Router();
+
+function tierFromPriceId(priceId) {
+  if (priceId === process.env.STRIPE_PRICE_ID_TIER2) return 'professional';
+  if (priceId === process.env.STRIPE_PRICE_ID_TIER3) return 'enterprise';
+  return 'starter';
+}
 
 const DEFAULT_HOURS = {
   "0": null,
@@ -308,13 +314,18 @@ onboardRouter.get('/payment-success', async (req, res) => {
     const clientId = session.metadata?.clientId;
     if (!clientId) throw new Error('Missing clientId in Stripe session metadata');
 
+    const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
+    const priceId = lineItems.data[0]?.price?.id;
+    const tier = tierFromPriceId(priceId);
+
     await sql`
       UPDATE clients SET
         stripe_customer_id = ${session.customer},
-        stripe_subscription_id = ${session.subscription}
+        stripe_subscription_id = ${session.subscription},
+        tier = ${tier}
       WHERE id = ${clientId}
     `;
-    console.log('[onboard] payment confirmed for:', clientId);
+    console.log('[onboard] payment confirmed for:', clientId, 'tier:', tier);
 
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
@@ -463,11 +474,12 @@ Always be calm, professional, and empathetic.`,
     await sql`
       UPDATE clients SET
         google_refresh_token = ${refreshToken},
-        twilio_phone_number = ${purchased.phoneNumber},
-        vapi_assistant_id = ${vapiAssistant.id},
-        vapi_phone_number_id = ${vapiPhone.id},
         status = 'active'
       WHERE id = ${clientId}
+    `;
+    await sql`
+      INSERT INTO phone_numbers (id, client_id, twilio_phone_number, vapi_phone_number_id, vapi_assistant_id, label)
+      VALUES (${uuidv4()}, ${clientId}, ${purchased.phoneNumber}, ${vapiPhone.id}, ${vapiAssistant.id}, 'Main')
     `;
 
     // Send portal welcome email

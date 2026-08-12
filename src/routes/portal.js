@@ -1,5 +1,10 @@
 import { Router } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+import twilio from 'twilio';
 import sql from '../db/index.js';
+import { TIER_LIMITS } from '../services/clientLoader.js';
+
+const TIER_NAMES = { starter: 'Starter', professional: 'Professional', enterprise: 'Enterprise' };
 
 export const portalRouter = Router();
 
@@ -56,6 +61,11 @@ portalRouter.get('/', requireClient, async (req, res) => {
   const [client] = await sql`SELECT * FROM clients WHERE portal_token = ${req.portalToken} AND status = 'active'`;
   if (!client) return res.redirect('/portal/login');
 
+  const phoneNumbers = await sql`SELECT * FROM phone_numbers WHERE client_id = ${client.id} ORDER BY created_at ASC`;
+  const tier = client.tier ?? 'starter';
+  const limit = TIER_LIMITS[tier];
+  const canAddNumber = phoneNumbers.length < limit;
+
   const calls = await sql`
     SELECT * FROM call_logs WHERE client_id = ${client.id} ORDER BY created_at DESC LIMIT 50
   `;
@@ -102,9 +112,9 @@ portalRouter.get('/', requireClient, async (req, res) => {
     <!-- Account info -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
       <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-        <p class="text-zinc-500 text-sm">Your Ringa Number</p>
-        <p class="text-xl font-bold text-sky-400 mt-1 font-mono">${client.twilio_phone_number ?? '—'}</p>
-        <p class="text-zinc-600 text-xs mt-1">Forward your business calls here</p>
+        <p class="text-zinc-500 text-sm">Plan</p>
+        <p class="text-xl font-bold text-white mt-1">${TIER_NAMES[tier]}</p>
+        <p class="text-zinc-600 text-xs mt-1">${phoneNumbers.length} of ${limit} numbers used</p>
       </div>
       <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
         <p class="text-zinc-500 text-sm">Total Calls</p>
@@ -114,6 +124,33 @@ portalRouter.get('/', requireClient, async (req, res) => {
         <p class="text-zinc-500 text-sm">Status</p>
         <p class="text-lg font-bold text-green-400 mt-1">Active</p>
         <p class="text-zinc-600 text-xs mt-1">AI receptionist is live</p>
+      </div>
+    </div>
+
+    <!-- Phone numbers -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden mb-6">
+      <div class="px-6 py-4 border-b border-zinc-800 flex items-center justify-between">
+        <div>
+          <h2 class="font-bold text-white">Your Ringa Numbers</h2>
+          <p class="text-zinc-500 text-sm mt-0.5">Forward your business calls to these numbers</p>
+        </div>
+        ${canAddNumber ? `
+        <form method="POST" action="/portal/add-number?token=${req.portalToken}">
+          <button type="submit" class="bg-sky-400 hover:bg-sky-300 text-black text-sm font-bold px-4 py-2 rounded-lg transition-colors">
+            + Add Location
+          </button>
+        </form>` : `
+        <span class="text-zinc-600 text-sm">${phoneNumbers.length}/${limit} numbers used</span>`}
+      </div>
+      <div class="divide-y divide-zinc-800">
+        ${phoneNumbers.map(pn => `
+        <div class="px-6 py-4 flex items-center justify-between">
+          <div>
+            <p class="font-semibold text-white font-mono text-lg">${pn.twilio_phone_number}</p>
+            <p class="text-zinc-500 text-xs mt-0.5">${pn.label}</p>
+          </div>
+          <span class="text-xs bg-green-900/40 text-green-400 border border-green-800 px-3 py-1 rounded-full">Live</span>
+        </div>`).join('')}
       </div>
     </div>
 
@@ -161,4 +198,79 @@ ${call.transcript}
 
 </body>
 </html>`);
+});
+
+// Add a new phone number / location
+portalRouter.post('/add-number', requireClient, async (req, res) => {
+  try {
+    const [client] = await sql`SELECT * FROM clients WHERE portal_token = ${req.portalToken} AND status = 'active'`;
+    if (!client) return res.redirect('/portal/login');
+
+    const tier = client.tier ?? 'starter';
+    const limit = TIER_LIMITS[tier];
+    const phoneNumbers = await sql`SELECT id FROM phone_numbers WHERE client_id = ${client.id}`;
+
+    if (phoneNumbers.length >= limit) {
+      return res.redirect(`/portal?token=${req.portalToken}&error=limit`);
+    }
+
+    const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    const areaCodes = [604, 778, 236, 250];
+    let numbers = [];
+    for (const areaCode of areaCodes) {
+      numbers = await twilioClient.availablePhoneNumbers('CA').local.list({ areaCode, limit: 1 });
+      if (numbers.length) break;
+    }
+    if (!numbers.length) throw new Error('No Canadian numbers available');
+
+    const purchased = await twilioClient.incomingPhoneNumbers.create({
+      phoneNumber: numbers[0].phoneNumber,
+      smsUrl: `${process.env.APP_URL}/webhooks/twilio/sms`,
+    });
+
+    const vapiRes = await fetch('https://api.vapi.ai/assistant', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${process.env.VAPI_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: `${client.business_name} Receptionist (Location ${phoneNumbers.length + 1})`,
+        model: {
+          provider: 'anthropic',
+          model: 'claude-sonnet-4-6',
+          messages: [{ role: 'system', content: `You are the friendly AI receptionist for ${client.business_name}, a plumbing and HVAC company. Book appointments and dispatch emergencies.` }],
+          tools: [
+            { type: 'function', function: { name: 'bookAppointment', description: 'Book a service appointment', parameters: { type: 'object', properties: { CustomerName: { type: 'string' }, Phone: { type: 'string' }, serviceType: { type: 'string' }, address: { type: 'string' }, startTime: { type: 'string' } }, required: ['CustomerName', 'Phone', 'serviceType', 'address', 'startTime'] } } },
+            { type: 'function', function: { name: 'dispatchEmergency', description: 'Alert on-call technician', parameters: { type: 'object', properties: { customerName: { type: 'string' }, phone: { type: 'string' }, address: { type: 'string' }, issue: { type: 'string' } }, required: ['customerName', 'phone', 'address', 'issue'] } } },
+          ],
+        },
+        voice: { provider: '11labs', voiceId: 'sarah' },
+        firstMessage: `Thank you for calling ${client.business_name}! How can I help you today?`,
+        serverUrl: `${process.env.APP_URL}/webhooks/vapi`,
+      }),
+    });
+    const vapiAssistant = await vapiRes.json();
+
+    const vapiImportRes = await fetch('https://api.vapi.ai/phone-number', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${process.env.VAPI_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        provider: 'twilio',
+        number: purchased.phoneNumber,
+        twilioAccountSid: process.env.TWILIO_ACCOUNT_SID,
+        twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
+        assistantId: vapiAssistant.id,
+      }),
+    });
+    const vapiPhone = await vapiImportRes.json();
+
+    await sql`
+      INSERT INTO phone_numbers (id, client_id, twilio_phone_number, vapi_phone_number_id, vapi_assistant_id, label)
+      VALUES (${uuidv4()}, ${client.id}, ${purchased.phoneNumber}, ${vapiPhone.id}, ${vapiAssistant.id}, ${`Location ${phoneNumbers.length + 1}`})
+    `;
+
+    console.log('[portal] added number:', purchased.phoneNumber, 'for client:', client.id);
+    res.redirect(`/portal?token=${req.portalToken}`);
+  } catch (err) {
+    console.error('[portal] add-number error:', err);
+    res.redirect(`/portal?token=${req.portalToken}&error=provision`);
+  }
 });
