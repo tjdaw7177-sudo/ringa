@@ -97,6 +97,52 @@ landingRouter.get('/', (_req, res) => {
     </div>
   </section>
 
+  <!-- Testimonials -->
+  <section class="py-24 px-6 border-t border-gray-800">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-extrabold">What business owners are saying</h2>
+        <p class="text-gray-500 mt-3 text-lg">Real results from plumbing and HVAC companies using Ringa</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+        <div class="metallic-card rounded-2xl p-7">
+          <div class="flex gap-1 mb-4">
+            ${'★'.repeat(5).split('').map(() => '<span class="text-yellow-400">★</span>').join('')}
+          </div>
+          <p class="text-gray-300 text-sm leading-relaxed mb-5">"I used to miss 4 or 5 calls a day while I was on a job. Since getting Ringa, every one of those calls turns into a booked appointment. It paid for itself in the first week."</p>
+          <div>
+            <p class="font-bold text-white text-sm">Mike T.</p>
+            <p class="text-gray-600 text-xs">Owner, T&S Plumbing — Surrey, BC</p>
+          </div>
+        </div>
+
+        <div class="metallic-card rounded-2xl p-7">
+          <div class="flex gap-1 mb-4">
+            ${'★'.repeat(5).split('').map(() => '<span class="text-yellow-400">★</span>').join('')}
+          </div>
+          <p class="text-gray-300 text-sm leading-relaxed mb-5">"My customers are always surprised how smooth it is. Ringa books the appointment, sends them a text, and reminds them the next day. I don't have to do anything."</p>
+          <div>
+            <p class="font-bold text-white text-sm">Sandra L.</p>
+            <p class="text-gray-600 text-xs">Owner, Comfort HVAC — Burnaby, BC</p>
+          </div>
+        </div>
+
+        <div class="metallic-card rounded-2xl p-7">
+          <div class="flex gap-1 mb-4">
+            ${'★'.repeat(5).split('').map(() => '<span class="text-yellow-400">★</span>').join('')}
+          </div>
+          <p class="text-gray-300 text-sm leading-relaxed mb-5">"We had a gas leak call at 2am on a Saturday. Ringa caught it, recognized it as an emergency, and texted my on-call guy immediately. That's exactly what we needed."</p>
+          <div>
+            <p class="font-bold text-white text-sm">Dave K.</p>
+            <p class="text-gray-600 text-xs">Owner, Kwik Plumbing — Langley, BC</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- How it works -->
   <section id="how-it-works" class="py-24 px-6">
     <div class="max-w-5xl mx-auto">
@@ -276,52 +322,6 @@ landingRouter.get('/', (_req, res) => {
         </div>
       </div>
 
-    </div>
-  </section>
-
-  <!-- Testimonials -->
-  <section class="py-24 px-6 border-t border-gray-800">
-    <div class="max-w-5xl mx-auto">
-      <div class="text-center mb-12">
-        <h2 class="text-4xl font-extrabold">What business owners are saying</h2>
-        <p class="text-gray-500 mt-3 text-lg">Real results from plumbing and HVAC companies using Ringa</p>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-
-        <div class="metallic-card rounded-2xl p-7">
-          <div class="flex gap-1 mb-4">
-            ${'★'.repeat(5).split('').map(() => '<span class="text-yellow-400">★</span>').join('')}
-          </div>
-          <p class="text-gray-300 text-sm leading-relaxed mb-5">"I used to miss 4 or 5 calls a day while I was on a job. Since getting Ringa, every one of those calls turns into a booked appointment. It paid for itself in the first week."</p>
-          <div>
-            <p class="font-bold text-white text-sm">Mike T.</p>
-            <p class="text-gray-600 text-xs">Owner, T&S Plumbing — Surrey, BC</p>
-          </div>
-        </div>
-
-        <div class="metallic-card rounded-2xl p-7">
-          <div class="flex gap-1 mb-4">
-            ${'★'.repeat(5).split('').map(() => '<span class="text-yellow-400">★</span>').join('')}
-          </div>
-          <p class="text-gray-300 text-sm leading-relaxed mb-5">"My customers are always surprised how smooth it is. Ringa books the appointment, sends them a text, and reminds them the next day. I don't have to do anything."</p>
-          <div>
-            <p class="font-bold text-white text-sm">Sandra L.</p>
-            <p class="text-gray-600 text-xs">Owner, Comfort HVAC — Burnaby, BC</p>
-          </div>
-        </div>
-
-        <div class="metallic-card rounded-2xl p-7">
-          <div class="flex gap-1 mb-4">
-            ${'★'.repeat(5).split('').map(() => '<span class="text-yellow-400">★</span>').join('')}
-          </div>
-          <p class="text-gray-300 text-sm leading-relaxed mb-5">"We had a gas leak call at 2am on a Saturday. Ringa caught it, recognized it as an emergency, and texted my on-call guy immediately. That's exactly what we needed."</p>
-          <div>
-            <p class="font-bold text-white text-sm">Dave K.</p>
-            <p class="text-gray-600 text-xs">Owner, Kwik Plumbing — Langley, BC</p>
-          </div>
-        </div>
-
-      </div>
     </div>
   </section>
 

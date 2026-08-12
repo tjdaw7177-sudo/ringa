@@ -41,6 +41,8 @@ vapiWebhookRouter.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Unknown client' });
     }
 
+    if (!message.toolCallList?.length) return res.sendStatus(200);
+
     const results = [];
 
     for (const toolCall of message.toolCallList) {

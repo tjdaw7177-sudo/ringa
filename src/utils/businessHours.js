@@ -25,7 +25,7 @@ export function isWithinBusinessHours(date, timezone = 'America/Vancouver', hour
 
   if (!hours) return { available: false, reason: "We're closed on Sundays." };
   if (hour < hours.open) return { available: false, reason: `We open at ${hours.open}:00 AM.` };
-  if (hour >= hours.close) return { available: false, reason: `We close at ${hours.close === 12 ? '12:00 PM' : `${hours.close - 12}:00 PM`} on ${weekday === 'Sat' ? 'Saturdays' : 'weekdays'}.` };
+  if (hour > hours.close) return { available: false, reason: `We close at ${hours.close === 12 ? '12:00 PM' : `${hours.close - 12}:00 PM`} on ${weekday === 'Sat' ? 'Saturdays' : 'weekdays'}.` };
 
   return { available: true };
 }

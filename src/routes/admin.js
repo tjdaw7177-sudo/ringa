@@ -32,7 +32,16 @@ function requireOwner(req, res, next) {
 }
 
 adminRouter.get('/', requireOwner, async (req, res) => {
-  const clients = await sql`SELECT * FROM clients ORDER BY created_at DESC`;
+  const clients = await sql`
+    SELECT c.*, pn.twilio_phone_number
+    FROM clients c
+    LEFT JOIN (
+      SELECT DISTINCT ON (client_id) client_id, twilio_phone_number
+      FROM phone_numbers
+      ORDER BY client_id, created_at ASC
+    ) pn ON pn.client_id = c.id
+    ORDER BY c.created_at DESC
+  `;
   const secret = req.query.secret;
 
   const statusBadge = (status) => {
