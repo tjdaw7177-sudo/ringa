@@ -134,6 +134,17 @@ onboardRouter.get('/', (req, res) => {
         </div>
       </div>
 
+      <div class="flex items-start gap-3 pt-2">
+        <input type="checkbox" name="agreed" id="agreed" required
+          class="mt-1 w-4 h-4 accent-blue-600 cursor-pointer flex-shrink-0">
+        <label for="agreed" class="text-sm text-gray-500 cursor-pointer">
+          I agree to Ringa's
+          <a href="/terms" target="_blank" class="text-blue-600 hover:underline">Terms of Service</a>
+          and
+          <a href="/privacy" target="_blank" class="text-blue-600 hover:underline">Privacy Policy</a>
+        </label>
+      </div>
+
       <button type="submit"
         class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-colors text-lg">
         Continue → Secure Payment
