@@ -242,7 +242,7 @@ portalRouter.post('/add-number', requireClient, async (req, res) => {
             { type: 'function', function: { name: 'dispatchEmergency', description: 'Alert on-call technician', parameters: { type: 'object', properties: { customerName: { type: 'string' }, phone: { type: 'string' }, address: { type: 'string' }, issue: { type: 'string' } }, required: ['customerName', 'phone', 'address', 'issue'] } } },
           ],
         },
-        voice: { provider: '11labs', voiceId: 'sarah' },
+        voice: { provider: '11labs', voiceId: 'jessica' },
         firstMessage: `Thank you for calling ${client.business_name}! How can I help you today?`,
         serverUrl: `${process.env.APP_URL}/webhooks/vapi`,
       }),

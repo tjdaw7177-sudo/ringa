@@ -9,6 +9,17 @@ landingRouter.get('/', (_req, res) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ringa — AI Receptionist for Plumbing & HVAC</title>
+  <meta name="description" content="Ringa answers every call, books appointments into your Google Calendar, sends SMS reminders, and dispatches emergencies — 24/7. Built for plumbing and HVAC businesses in Canada.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://getringa.ca">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://getringa.ca">
+  <meta property="og:title" content="Ringa — AI Receptionist for Plumbing & HVAC">
+  <meta property="og:description" content="Never miss a call again. Ringa answers 24/7, books appointments, and handles emergencies — so you can focus on the job.">
+  <meta property="og:site_name" content="Ringa">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Ringa — AI Receptionist for Plumbing & HVAC">
+  <meta name="twitter:description" content="Never miss a call again. Ringa answers 24/7, books appointments, and handles emergencies — so you can focus on the job.">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
