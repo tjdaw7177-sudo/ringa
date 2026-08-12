@@ -53,10 +53,10 @@ landingRouter.get('/', (_req, res) => {
         Built for Plumbing & HVAC
       </div>
       <h1 class="text-5xl sm:text-6xl font-extrabold leading-tight mb-6">
-        Never miss a <span class="accent">service call</span> again
+        Your business, <span class="accent">always open</span>
       </h1>
       <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-        Ringa answers your phones 24/7, books appointments straight to your Google Calendar, and dispatches emergencies instantly — so you can focus on the work.
+        Ringa is your AI receptionist — it answers every call, books appointments into your calendar, sends reminder texts, and handles emergencies. All day, every day, without you picking up the phone.
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <a href="/onboard"
@@ -200,6 +200,79 @@ landingRouter.get('/', (_req, res) => {
         </div>
 
       </div>
+
+      <!-- What's included detail -->
+      <div class="mt-16 metallic-card rounded-2xl p-8 border border-zinc-800">
+        <h3 class="text-2xl font-extrabold text-white text-center mb-10">Everything included on every plan</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+
+          <div class="flex gap-4">
+            <div class="text-2xl flex-shrink-0">📞</div>
+            <div>
+              <p class="font-bold text-white mb-1">Answers every call, 24/7</p>
+              <p class="text-gray-500 text-sm">Ringa picks up the phone every time — evenings, weekends, holidays. Customers always reach a live voice, never a voicemail.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <div class="text-2xl flex-shrink-0">📅</div>
+            <div>
+              <p class="font-bold text-white mb-1">Books appointments automatically</p>
+              <p class="text-gray-500 text-sm">Ringa asks the customer for their name, address, and what they need — then books it straight into your Google Calendar. No back-and-forth, no manual entry.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <div class="text-2xl flex-shrink-0">💬</div>
+            <div>
+              <p class="font-bold text-white mb-1">Sends text confirmations</p>
+              <p class="text-gray-500 text-sm">After every booking, the customer automatically gets a text with their appointment details. They can reply REMOVE to cancel or RESCHEDULE to change the time.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <div class="text-2xl flex-shrink-0">⏰</div>
+            <div>
+              <p class="font-bold text-white mb-1">Reminds customers the day before</p>
+              <p class="text-gray-500 text-sm">Ringa automatically sends a reminder text 24 hours before each appointment — cutting down no-shows without you lifting a finger.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <div class="text-2xl flex-shrink-0">🚨</div>
+            <div>
+              <p class="font-bold text-white mb-1">Handles emergencies instantly</p>
+              <p class="text-gray-500 text-sm">If a customer calls with a gas leak, flooding, or no heat — Ringa recognizes it as an emergency and immediately texts your on-call technician with the customer's name, address, and problem.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <div class="text-2xl flex-shrink-0">🕐</div>
+            <div>
+              <p class="font-bold text-white mb-1">Respects your business hours</p>
+              <p class="text-gray-500 text-sm">Ringa only books appointments during your open hours. Try to book on a Sunday? It'll let the customer know when you're available next.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <div class="text-2xl flex-shrink-0">📋</div>
+            <div>
+              <p class="font-bold text-white mb-1">Full call transcripts in your portal</p>
+              <p class="text-gray-500 text-sm">Every call is recorded and transcribed. Log into your portal any time to read a full summary of what was discussed on every call.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <div class="text-2xl flex-shrink-0">⚡</div>
+            <div>
+              <p class="font-bold text-white mb-1">Ready in under 2 minutes</p>
+              <p class="text-gray-500 text-sm">No equipment to install. No tech skills needed. Sign up, connect your Google Calendar, and your AI receptionist is live — that's it.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   </section>
 

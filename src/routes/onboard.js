@@ -115,10 +115,10 @@ onboardRouter.get('/', (req, res) => {
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Emergency / On-Call Number</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Business Phone Number</label>
           <input name="emergencyNumber" type="tel" required placeholder="+17785551234"
             class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <p class="text-xs text-gray-400 mt-1">Gets an SMS when a caller reports an emergency</p>
+          <p class="text-xs text-gray-400 mt-1">If a caller has an emergency, we'll send an urgent text to this number</p>
         </div>
 
         <div>
@@ -278,7 +278,7 @@ onboardRouter.get('/owner', (req, res) => {
           class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Emergency Number</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Business Phone Number</label>
         <input name="emergencyNumber" type="tel" required placeholder="+17785551234"
           class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
