@@ -1,5 +1,29 @@
 import { Resend } from 'resend';
 
+export async function sendNewClientAlert({ businessName, email, ringaNumber, tier }) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const TIER_PRICES = { starter: '$399', professional: '$599', enterprise: '$799' };
+  await resend.emails.send({
+    from: process.env.RESEND_FROM,
+    to: 'getringa@gmail.com',
+    subject: `New client signed up — ${businessName}`,
+    html: `
+      <div style="font-family:Inter,sans-serif;background:#0a0a0a;padding:40px 20px;">
+        <div style="max-width:500px;margin:0 auto;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:16px;padding:32px;">
+          <p style="color:#38bdf8;font-size:13px;font-weight:700;text-transform:uppercase;margin:0 0 8px;">New Signup</p>
+          <h1 style="color:#ffffff;font-size:24px;font-weight:800;margin:0 0 24px;">${businessName} just signed up</h1>
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="color:#6b7280;font-size:13px;padding:8px 0;border-bottom:1px solid #2a2a2a;">Business</td><td style="color:#ffffff;font-size:13px;padding:8px 0;border-bottom:1px solid #2a2a2a;text-align:right;">${businessName}</td></tr>
+            <tr><td style="color:#6b7280;font-size:13px;padding:8px 0;border-bottom:1px solid #2a2a2a;">Email</td><td style="color:#ffffff;font-size:13px;padding:8px 0;border-bottom:1px solid #2a2a2a;text-align:right;">${email}</td></tr>
+            <tr><td style="color:#6b7280;font-size:13px;padding:8px 0;border-bottom:1px solid #2a2a2a;">Plan</td><td style="color:#38bdf8;font-size:13px;font-weight:700;padding:8px 0;border-bottom:1px solid #2a2a2a;text-align:right;">${tier} — ${TIER_PRICES[tier] ?? ''}/mo</td></tr>
+            <tr><td style="color:#6b7280;font-size:13px;padding:8px 0;">Ringa Number</td><td style="color:#ffffff;font-size:13px;font-family:monospace;padding:8px 0;text-align:right;">${ringaNumber}</td></tr>
+          </table>
+        </div>
+      </div>`,
+  });
+  console.log('[email] new client alert sent for:', businessName);
+}
+
 export async function sendPortalWelcome({ to, businessName, portalUrl, ringaNumber }) {
   const resend = new Resend(process.env.RESEND_API_KEY);
   const { html, subject } = portalWelcomeEmail({ businessName, portalUrl, ringaNumber });

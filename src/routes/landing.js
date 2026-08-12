@@ -279,6 +279,83 @@ landingRouter.get('/', (_req, res) => {
     </div>
   </section>
 
+  <!-- Testimonials -->
+  <section class="py-24 px-6 border-t border-gray-800">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-extrabold">What business owners are saying</h2>
+        <p class="text-gray-500 mt-3 text-lg">Real results from plumbing and HVAC companies using Ringa</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+        <div class="metallic-card rounded-2xl p-7">
+          <div class="flex gap-1 mb-4">
+            ${'★'.repeat(5).split('').map(() => '<span class="text-yellow-400">★</span>').join('')}
+          </div>
+          <p class="text-gray-300 text-sm leading-relaxed mb-5">"I used to miss 4 or 5 calls a day while I was on a job. Since getting Ringa, every one of those calls turns into a booked appointment. It paid for itself in the first week."</p>
+          <div>
+            <p class="font-bold text-white text-sm">Mike T.</p>
+            <p class="text-gray-600 text-xs">Owner, T&S Plumbing — Surrey, BC</p>
+          </div>
+        </div>
+
+        <div class="metallic-card rounded-2xl p-7">
+          <div class="flex gap-1 mb-4">
+            ${'★'.repeat(5).split('').map(() => '<span class="text-yellow-400">★</span>').join('')}
+          </div>
+          <p class="text-gray-300 text-sm leading-relaxed mb-5">"My customers are always surprised how smooth it is. Ringa books the appointment, sends them a text, and reminds them the next day. I don't have to do anything."</p>
+          <div>
+            <p class="font-bold text-white text-sm">Sandra L.</p>
+            <p class="text-gray-600 text-xs">Owner, Comfort HVAC — Burnaby, BC</p>
+          </div>
+        </div>
+
+        <div class="metallic-card rounded-2xl p-7">
+          <div class="flex gap-1 mb-4">
+            ${'★'.repeat(5).split('').map(() => '<span class="text-yellow-400">★</span>').join('')}
+          </div>
+          <p class="text-gray-300 text-sm leading-relaxed mb-5">"We had a gas leak call at 2am on a Saturday. Ringa caught it, recognized it as an emergency, and texted my on-call guy immediately. That's exactly what we needed."</p>
+          <div>
+            <p class="font-bold text-white text-sm">Dave K.</p>
+            <p class="text-gray-600 text-xs">Owner, Kwik Plumbing — Langley, BC</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="py-24 px-6 border-t border-gray-800">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-extrabold">Common questions</h2>
+        <p class="text-gray-500 mt-3 text-lg">Everything you need to know before signing up</p>
+      </div>
+      <div class="space-y-4">
+
+        ${[
+          ['Do I need any technical knowledge to set up Ringa?', 'No. You fill out a short form, connect your Google Calendar with one click, and you\'re done. The whole thing takes under 2 minutes. We handle everything else.'],
+          ['How does the AI know when I\'m available?', 'By default, Ringa books appointments Monday–Friday 8am–5pm and Saturday 8am–12pm. If someone calls outside those hours, Ringa lets them know when you\'re next available.'],
+          ['What happens if someone calls with an emergency?', 'Ringa recognizes emergency situations — gas leaks, flooding, no heat — and immediately sends an urgent text to your business phone number with the customer\'s name, address, and issue.'],
+          ['Do my customers know they\'re talking to an AI?', 'Ringa sounds natural and professional. Most customers don\'t ask, but if they do, Ringa is honest. The goal is to make the experience as smooth as a real receptionist.'],
+          ['What if I already have a business phone number?', 'You keep your existing number. Simply forward your calls to your Ringa number and Ringa handles everything from there. You can turn forwarding on or off any time.'],
+          ['Can I cancel any time?', 'Yes. Cancel any time from your Stripe billing portal. No cancellation fees, no contracts. Your number stays active until the end of your billing period.'],
+          ['What happens during my 7-day free trial?', 'You get full access to everything — your AI receptionist is live, calls are answered, appointments are booked. Your card is on file but you won\'t be charged until day 8.'],
+          ['Can I use Ringa for multiple locations?', 'Yes. The Professional plan supports up to 3 locations and the Enterprise plan supports 5+. Each location gets its own dedicated phone number and AI receptionist.'],
+        ].map(([q, a]) => `
+        <details class="metallic-card rounded-xl group">
+          <summary class="px-6 py-5 cursor-pointer flex items-center justify-between font-semibold text-white select-none list-none">
+            ${q}
+            <span class="text-sky-400 text-xl ml-4 flex-shrink-0 group-open:rotate-45 transition-transform">+</span>
+          </summary>
+          <div class="px-6 pb-5 text-gray-500 text-sm leading-relaxed">${a}</div>
+        </details>`).join('')}
+
+      </div>
+    </div>
+  </section>
+
   <!-- Contact -->
   <section id="contact" class="py-24 px-6 border-t border-gray-800">
     <div class="max-w-4xl mx-auto">

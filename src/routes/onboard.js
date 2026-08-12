@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Stripe from 'stripe';
 import sql from '../db/index.js';
 import twilio from 'twilio';
-import { sendPortalWelcome } from '../services/email.js';
+import { sendPortalWelcome, sendNewClientAlert } from '../services/email.js';
 import { TIER_LIMITS } from '../services/clientLoader.js';
 
 export const onboardRouter = Router();
@@ -396,14 +396,16 @@ onboardRouter.get('/google/callback', async (req, res) => {
           model: 'claude-sonnet-4-6',
           messages: [{
             role: 'system',
-            content: `You are the friendly AI receptionist for ${client.business_name}, a plumbing and HVAC company. Your job is to:
-1. Greet callers warmly and understand their need
-2. Determine if this is an EMERGENCY (no heat, gas leak, flooding) or a routine appointment
-3. For emergencies: collect name, address, and issue, then call dispatchEmergency
-4. For appointments: collect name, phone, service address, service type, and preferred time, then call bookAppointment
-5. Confirm all details back before executing any function
+            content: `You are a warm, professional receptionist for ${client.business_name}, a plumbing and HVAC company. You answer calls naturally, like a real person would — not robotic, not scripted.
 
-Always be calm, professional, and empathetic.`,
+Your job:
+1. Answer warmly and find out what the caller needs
+2. If it sounds like an emergency — gas leak, flooding, no heat in winter, burst pipe — act fast. Get their name, address, and what's happening, then call dispatchEmergency right away. Don't make them wait.
+3. For regular service requests — leaky faucets, furnace tune-up, installation, etc. — collect their name, best callback number, service address, what they need done, and a preferred date and time. Then call bookAppointment.
+4. Always read back the details before booking so they can confirm.
+5. If they just have a question you can't answer, take their name and number and let them know someone will call them back.
+
+Tone: friendly, calm, efficient. Keep responses short — this is a phone call, not an email. Never say "certainly" or "absolutely". Sound like a real person.`,
           }],
           tools: [
             {
@@ -443,7 +445,7 @@ Always be calm, professional, and empathetic.`,
             },
           ],
         },
-        voice: { provider: '11labs', voiceId: 'sarah' },
+        voice: { provider: '11labs', voiceId: 'jessica' },
         firstMessage: `Thank you for calling ${client.business_name}! How can I help you today?`,
         serverUrl: `${process.env.APP_URL}/webhooks/vapi`,
       }),
@@ -482,7 +484,7 @@ Always be calm, professional, and empathetic.`,
       VALUES (${uuidv4()}, ${clientId}, ${purchased.phoneNumber}, ${vapiPhone.id}, ${vapiAssistant.id}, 'Main')
     `;
 
-    // Send portal welcome email
+    // Send portal welcome email to client
     if (client.email) {
       await sendPortalWelcome({
         to: client.email,
@@ -491,6 +493,15 @@ Always be calm, professional, and empathetic.`,
         ringaNumber: purchased.phoneNumber,
       }).catch(err => console.error('[email] failed to send welcome:', err.message));
     }
+
+    // Notify owner of new signup
+    await sendNewClientAlert({
+      businessName: client.business_name,
+      email: client.email ?? 'unknown',
+      ringaNumber: purchased.phoneNumber,
+      tier: client.tier ?? 'starter',
+    }).catch(err => console.error('[email] failed to send owner alert:', err.message));
+
     console.log('[onboard] client activated:', clientId);
 
     res.send(`<!DOCTYPE html>
