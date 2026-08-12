@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import twilio from 'twilio';
 import sql from '../db/index.js';
 import { portalWelcomeEmail } from '../services/email.js';
 
@@ -205,7 +206,53 @@ adminRouter.get('/email-preview', requireOwner, (req, res) => {
 
 adminRouter.post('/delete', requireOwner, async (req, res) => {
   const { clientId } = req.body;
-  await sql`DELETE FROM clients WHERE id = ${clientId}`;
-  console.log('[admin] deleted client:', clientId);
+  try {
+    const phoneNumbers = await sql`SELECT * FROM phone_numbers WHERE client_id = ${clientId}`;
+    const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+    for (const pn of phoneNumbers) {
+      // Release Twilio number
+      try {
+        const numbers = await twilioClient.incomingPhoneNumbers.list({ phoneNumber: pn.twilio_phone_number });
+        if (numbers.length) await twilioClient.incomingPhoneNumbers(numbers[0].sid).remove();
+        console.log('[admin] released twilio number:', pn.twilio_phone_number);
+      } catch (err) {
+        console.error('[admin] failed to release twilio number:', pn.twilio_phone_number, err.message);
+      }
+
+      // Delete Vapi phone number
+      if (pn.vapi_phone_number_id) {
+        try {
+          await fetch(`https://api.vapi.ai/phone-number/${pn.vapi_phone_number_id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${process.env.VAPI_API_KEY}` },
+          });
+          console.log('[admin] deleted vapi phone number:', pn.vapi_phone_number_id);
+        } catch (err) {
+          console.error('[admin] failed to delete vapi phone number:', err.message);
+        }
+      }
+
+      // Delete Vapi assistant
+      if (pn.vapi_assistant_id) {
+        try {
+          await fetch(`https://api.vapi.ai/assistant/${pn.vapi_assistant_id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${process.env.VAPI_API_KEY}` },
+          });
+          console.log('[admin] deleted vapi assistant:', pn.vapi_assistant_id);
+        } catch (err) {
+          console.error('[admin] failed to delete vapi assistant:', err.message);
+        }
+      }
+    }
+
+    await sql`DELETE FROM call_logs WHERE client_id = ${clientId}`;
+    await sql`DELETE FROM phone_numbers WHERE client_id = ${clientId}`;
+    await sql`DELETE FROM clients WHERE id = ${clientId}`;
+    console.log('[admin] deleted client and cleaned up resources:', clientId);
+  } catch (err) {
+    console.error('[admin] delete error:', err);
+  }
   res.redirect(`/admin?secret=${req.query.secret}`);
 });

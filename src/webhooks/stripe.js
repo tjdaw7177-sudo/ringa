@@ -29,7 +29,14 @@ stripeWebhookRouter.post('/', async (req, res) => {
 
   if (event.type === 'invoice.payment_failed') {
     const customerId = event.data.object.customer;
-    console.warn('[stripe] payment failed for customer:', customerId);
+    await sql`UPDATE clients SET status = 'past_due' WHERE stripe_customer_id = ${customerId}`;
+    console.warn('[stripe] payment failed, marked past_due for customer:', customerId);
+  }
+
+  if (event.type === 'invoice.paid') {
+    const customerId = event.data.object.customer;
+    await sql`UPDATE clients SET status = 'active' WHERE stripe_customer_id = ${customerId} AND status = 'past_due'`;
+    console.log('[stripe] payment recovered, reactivated customer:', customerId);
   }
 
   res.json({ received: true });

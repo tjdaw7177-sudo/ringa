@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import twilio from 'twilio';
+import Stripe from 'stripe';
 import sql from '../db/index.js';
 import { TIER_LIMITS } from '../services/clientLoader.js';
 
@@ -51,14 +52,14 @@ portalRouter.get('/login', (req, res) => {
 // Login submit
 portalRouter.post('/login', async (req, res) => {
   const { email } = req.body;
-  const [client] = await sql`SELECT portal_token FROM clients WHERE email = ${email} AND status = 'active'`;
+  const [client] = await sql`SELECT portal_token FROM clients WHERE email = ${email} AND status IN ('active', 'past_due')`;
   if (!client) return res.redirect('/portal/login?error=1');
   res.redirect(`/portal?token=${client.portal_token}`);
 });
 
 // Portal dashboard
 portalRouter.get('/', requireClient, async (req, res) => {
-  const [client] = await sql`SELECT * FROM clients WHERE portal_token = ${req.portalToken} AND status = 'active'`;
+  const [client] = await sql`SELECT * FROM clients WHERE portal_token = ${req.portalToken} AND status IN ('active', 'past_due')`;
   if (!client) return res.redirect('/portal/login');
 
   const phoneNumbers = await sql`SELECT * FROM phone_numbers WHERE client_id = ${client.id} ORDER BY created_at ASC`;
@@ -103,11 +104,23 @@ portalRouter.get('/', requireClient, async (req, res) => {
     </span>
     <div class="flex items-center gap-4">
       <span class="text-zinc-400 text-sm">${client.business_name}</span>
+      <a href="/portal/billing?token=${req.portalToken}" class="text-sky-400 hover:text-sky-300 text-sm font-medium transition-colors">Manage Billing</a>
       <a href="/portal/login" class="text-zinc-600 hover:text-white text-sm transition-colors">Sign out</a>
     </div>
   </nav>
 
   <div class="max-w-5xl mx-auto px-6 py-8">
+
+    ${client.status === 'past_due' ? `
+    <div class="bg-red-900/30 border border-red-700 rounded-xl px-5 py-4 mb-6 flex items-center justify-between gap-4">
+      <div>
+        <p class="text-red-400 font-semibold text-sm">Payment failed</p>
+        <p class="text-red-300/70 text-xs mt-0.5">Your last payment didn't go through. Update your billing details to keep your AI receptionist active.</p>
+      </div>
+      <a href="/portal/billing?token=${req.portalToken}" class="flex-shrink-0 bg-red-500 hover:bg-red-400 text-white text-sm font-bold px-4 py-2 rounded-lg transition-colors">
+        Fix Payment
+      </a>
+    </div>` : ''}
 
     <!-- Account info -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -198,6 +211,23 @@ ${call.transcript}
 
 </body>
 </html>`);
+});
+
+// Stripe billing portal redirect
+portalRouter.get('/billing', requireClient, async (req, res) => {
+  try {
+    const [client] = await sql`SELECT * FROM clients WHERE portal_token = ${req.portalToken} AND status IN ('active', 'past_due')`;
+    if (!client || !client.stripe_customer_id) return res.redirect(`/portal?token=${req.portalToken}`);
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const session = await stripe.billingPortal.sessions.create({
+      customer: client.stripe_customer_id,
+      return_url: `${process.env.APP_URL}/portal?token=${req.portalToken}`,
+    });
+    res.redirect(session.url);
+  } catch (err) {
+    console.error('[portal] billing portal error:', err);
+    res.redirect(`/portal?token=${req.portalToken}`);
+  }
 });
 
 // Add a new phone number / location
