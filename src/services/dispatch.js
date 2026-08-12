@@ -4,7 +4,9 @@ function getTwilioClient(client) {
   return twilio(client.twilio.accountSid, client.twilio.authToken);
 }
 
-export async function dispatchEmergency({ customerName, phone, address, issue }, client) {
+export async function dispatchEmergency({ customerName, CustomerName, phone, Phone, address, issue }, client) {
+  customerName = customerName ?? CustomerName;
+  phone = phone ?? Phone;
   const twilioClient = getTwilioClient(client);
   const body = `EMERGENCY DISPATCH\nCustomer: ${customerName}\nPhone: ${phone}\nAddress: ${address}\nIssue: ${issue}`;
 

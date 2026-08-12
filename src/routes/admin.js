@@ -45,9 +45,9 @@ adminRouter.get('/', requireOwner, async (req, res) => {
   };
 
   const activeClients = clients.filter(c => c.status === 'active');
-  const revenue = activeClients.reduce((sum, c) => {
-    if (c.stripe_subscription_id) return sum + 399;
-    return sum;
+  const TIER_PRICES = { starter: 399, professional: 599, enterprise: 799 };
+  const mrr = activeClients.reduce((sum, c) => {
+    return sum + (TIER_PRICES[c.tier ?? 'starter'] ?? 399);
   }, 0);
 
   res.send(`<!DOCTYPE html>
@@ -91,7 +91,7 @@ adminRouter.get('/', requireOwner, async (req, res) => {
       </div>
       <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
         <p class="text-zinc-500 text-sm">Est. MRR</p>
-        <p class="text-3xl font-extrabold text-sky-400 mt-1">$${(activeClients.length * 399).toLocaleString()}</p>
+        <p class="text-3xl font-extrabold text-sky-400 mt-1">$${mrr.toLocaleString()}</p>
       </div>
     </div>
 

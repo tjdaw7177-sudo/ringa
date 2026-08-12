@@ -164,7 +164,7 @@ portalRouter.get('/', requireClient, async (req, res) => {
       ${calls.length === 0 ? `
       <div class="text-center py-16">
         <p class="text-zinc-500 text-lg">No calls yet</p>
-        <p class="text-zinc-600 text-sm mt-1">Forward your business line to ${client.twilio_phone_number} to get started</p>
+        <p class="text-zinc-600 text-sm mt-1">Forward your business line to ${phoneNumbers[0]?.twilio_phone_number ?? 'your Ringa number'} to get started</p>
       </div>` : `
       <div class="divide-y divide-zinc-800">
         ${calls.map((call, i) => `
