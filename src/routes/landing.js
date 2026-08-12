@@ -217,7 +217,7 @@ landingRouter.get('/', (_req, res) => {
 
   <!-- Footer -->
   <footer class="py-8 px-6 border-t border-gray-800 text-center text-sm text-gray-600">
-    <p>&copy; 2026 <span class="logo-ring">Ring</span><span class="logo-a">a</span>. All rights reserved.</p>
+    <p>&copy; 2026 <span class="logo-ring">Ring</span><span class="logo-a">a</span> &nbsp;·&nbsp; <a href="/terms" class="hover:text-gray-400 transition-colors">Terms of Service</a> &nbsp;·&nbsp; <a href="/privacy" class="hover:text-gray-400 transition-colors">Privacy Policy</a></p>
   </footer>
 
 </body>

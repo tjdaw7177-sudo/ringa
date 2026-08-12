@@ -6,6 +6,7 @@ import { onboardRouter } from './routes/onboard.js';
 import { landingRouter } from './routes/landing.js';
 import { adminRouter } from './routes/admin.js';
 import { portalRouter } from './routes/portal.js';
+import { legalRouter } from './routes/legal.js';
 import { startReminderCron } from './services/reminders.js';
 
 if (process.env.NODE_ENV !== 'production') {
@@ -27,6 +28,7 @@ app.use('/webhooks/twilio', twilioWebhookRouter);
 app.use('/onboard', onboardRouter);
 app.use('/admin', adminRouter);
 app.use('/portal', portalRouter);
+app.use('/', legalRouter);
 app.use('/', landingRouter);
 
 const port = process.env.PORT ?? 3000;
