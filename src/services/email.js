@@ -1,3 +1,18 @@
+import { Resend } from 'resend';
+
+export async function sendPortalWelcome({ to, businessName, portalUrl, ringaNumber }) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const { html, subject } = portalWelcomeEmail({ businessName, portalUrl, ringaNumber });
+  const { error } = await resend.emails.send({
+    from: process.env.RESEND_FROM,
+    to,
+    subject,
+    html,
+  });
+  if (error) throw new Error(`Resend error: ${JSON.stringify(error)}`);
+  console.log('[email] portal welcome sent to:', to);
+}
+
 export function portalWelcomeEmail({ businessName, portalUrl, ringaNumber }) {
   return {
     subject: `Your Ringa AI receptionist is live — access your portal`,

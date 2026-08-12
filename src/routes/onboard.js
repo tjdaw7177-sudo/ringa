@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Stripe from 'stripe';
 import sql from '../db/index.js';
 import twilio from 'twilio';
+import { sendPortalWelcome } from '../services/email.js';
 
 
 export const onboardRouter = Router();
@@ -456,6 +457,16 @@ Always be calm, professional, and empathetic.`,
         status = 'active'
       WHERE id = ${clientId}
     `;
+
+    // Send portal welcome email
+    if (client.email) {
+      await sendPortalWelcome({
+        to: client.email,
+        businessName: client.business_name,
+        portalUrl: `${process.env.APP_URL}/portal/login`,
+        ringaNumber: purchased.phoneNumber,
+      }).catch(err => console.error('[email] failed to send welcome:', err.message));
+    }
     console.log('[onboard] client activated:', clientId);
 
     res.send(`<!DOCTYPE html>
