@@ -68,7 +68,7 @@ landingRouter.get('/', (_req, res) => {
           See How It Works
         </a>
       </div>
-      <p class="text-sm text-gray-600 mt-4">Set up in 2 minutes. No technical knowledge needed.</p>
+      <p class="text-sm text-gray-600 mt-4">7-day free trial. Set up in 2 minutes. No technical knowledge needed.</p>
     </div>
   </section>
 
@@ -151,7 +151,7 @@ landingRouter.get('/', (_req, res) => {
     <div class="max-w-5xl mx-auto">
       <div class="text-center mb-16">
         <h2 class="text-4xl font-extrabold">Simple, transparent pricing</h2>
-        <p class="text-gray-500 mt-3 text-lg">No setup fees. Cancel any time.</p>
+        <p class="text-gray-500 mt-3 text-lg">7-day free trial on all plans. No setup fees. Cancel any time.</p>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
 

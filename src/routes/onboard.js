@@ -197,6 +197,7 @@ onboardRouter.post('/submit', async (req, res) => {
       mode: 'subscription',
       customer_email: email,
       line_items: [{ price: priceId, quantity: 1 }],
+      subscription_data: { trial_period_days: 7 },
       metadata: { clientId },
       success_url: `${process.env.APP_URL}/onboard/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.APP_URL}/onboard`,
