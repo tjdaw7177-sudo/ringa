@@ -39,10 +39,13 @@ landingRouter.get('/', (_req, res) => {
       <span class="text-xl font-extrabold tracking-tight">
         <span class="logo-ring">Ring</span><span class="logo-a">a</span>
       </span>
-      <a href="/onboard"
-        class="accent-bg hover:bg-sky-400 text-black text-sm font-bold px-5 py-2.5 rounded-lg transition-colors">
-        Get Started
-      </a>
+      <div class="flex items-center gap-6">
+        <a href="#contact" class="text-gray-400 hover:text-white text-sm font-medium transition-colors hidden sm:block">Contact</a>
+        <a href="/onboard"
+          class="accent-bg hover:bg-sky-400 text-black text-sm font-bold px-5 py-2.5 rounded-lg transition-colors">
+          Get Started
+        </a>
+      </div>
     </div>
   </nav>
 
@@ -273,6 +276,37 @@ landingRouter.get('/', (_req, res) => {
         </div>
       </div>
 
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="py-24 px-6 border-t border-gray-800">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl font-extrabold">Have questions? We're here.</h2>
+        <p class="text-gray-500 mt-3 text-lg">Talk to a real person before you sign up — no pressure, no sales pitch.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+        <div class="metallic-card rounded-2xl p-8 flex gap-5 items-start">
+          <div class="text-3xl flex-shrink-0">📧</div>
+          <div>
+            <p class="font-bold text-white text-lg mb-1">Email us</p>
+            <p class="text-gray-500 text-sm mb-3">Send us any question and we'll get back to you within a few hours.</p>
+            <a href="mailto:getringa@gmail.com" class="accent font-semibold hover:underline">getringa@gmail.com</a>
+          </div>
+        </div>
+
+        <div class="metallic-card rounded-2xl p-8 flex gap-5 items-start">
+          <div class="text-3xl flex-shrink-0">📱</div>
+          <div>
+            <p class="font-bold text-white text-lg mb-1">Call or text us</p>
+            <p class="text-gray-500 text-sm mb-3">Speak directly with someone from the Ringa team — call or text anytime.</p>
+            <a href="tel:+12368822840" class="accent font-semibold hover:underline">+1 (236) 882-2840</a>
+          </div>
+        </div>
+
+      </div>
     </div>
   </section>
 
