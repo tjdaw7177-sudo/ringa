@@ -56,7 +56,7 @@ export async function bookAppointment({ customerName, CustomerName, phone, Phone
 export async function getUpcomingAppointmentByPhone(phone, client) {
   const calendar = getCalendarClient(client);
   const now = new Date();
-  const future = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const future = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
   const { data } = await calendar.events.list({
     calendarId: client.google.calendarId,

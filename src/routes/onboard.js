@@ -168,6 +168,10 @@ onboardRouter.post('/submit', async (req, res) => {
     const srcMatch = calendarId?.match(/[?&]src=([^&]+)/);
     if (srcMatch) calendarId = decodeURIComponent(srcMatch[1]);
 
+    if (!req.body.agreed) {
+      return res.status(400).send('You must accept the Terms of Service to continue.');
+    }
+
     const validPriceIds = [
       process.env.STRIPE_PRICE_ID_TIER1,
       process.env.STRIPE_PRICE_ID_TIER2,
@@ -175,6 +179,11 @@ onboardRouter.post('/submit', async (req, res) => {
     ];
     if (!validPriceIds.includes(priceId)) {
       return res.status(400).send('Invalid plan selected.');
+    }
+
+    const [existing] = await sql`SELECT id FROM clients WHERE email = ${email}`;
+    if (existing) {
+      return res.status(400).send(`An account with that email already exists. <a href="/portal/login">Sign in to your portal →</a>`);
     }
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -362,6 +371,7 @@ onboardRouter.get('/google/callback', async (req, res) => {
     const { tokens } = await oauth2Client.getToken(code);
     const refreshToken = tokens.refresh_token;
     console.log('[onboard] got refresh token:', !!refreshToken);
+    if (!refreshToken) throw new Error('Google did not return a refresh token. Please go back and try signing up again.');
 
     const [client] = await sql`SELECT * FROM clients WHERE id = ${clientId}`;
     console.log('[onboard] loaded client:', client?.business_name);
@@ -471,6 +481,7 @@ Tone: friendly, calm, efficient. Keep responses short — this is a phone call, 
     });
     const vapiPhone = await vapiImportRes.json();
     console.log('[onboard] imported phone into Vapi:', vapiPhone.id);
+    if (!vapiPhone.id) throw new Error(`Vapi phone import failed: ${JSON.stringify(vapiPhone)}`);
 
     // Save everything to DB
     await sql`
@@ -524,8 +535,13 @@ Tone: friendly, calm, efficient. Keep responses short — this is a phone call, 
       <p class="text-sm text-gray-400 mt-2">Forward your business calls to this number</p>
     </div>
 
-    <p class="text-sm text-gray-500">Bookings will appear in your Google Calendar automatically.<br>
+    <p class="text-sm text-gray-500 mb-6">Bookings will appear in your Google Calendar automatically.<br>
     Customers can text <strong>REMOVE</strong> to cancel or <strong>RESCHEDULE</strong> to change.</p>
+
+    <a href="/portal/login"
+      class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors">
+      Go to your portal →
+    </a>
   </div>
 </body>
 </html>`);
