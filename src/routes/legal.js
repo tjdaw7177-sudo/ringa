@@ -2,6 +2,48 @@ import { Router } from 'express';
 
 export const legalRouter = Router();
 
+legalRouter.get('/catalog.csv', (_req, res) => {
+  const rows = [
+    ['id', 'title', 'description', 'availability', 'condition', 'price', 'link', 'image_link', 'brand'],
+    [
+      'ringa-starter',
+      'Ringa Starter Plan',
+      'AI receptionist for plumbing & HVAC businesses. Answers every call 24/7, books appointments to Google Calendar, sends SMS confirmations and reminders, handles emergency dispatch. 1 dedicated phone number.',
+      'in stock',
+      'new',
+      '399.00 CAD',
+      'https://getringa.ca/onboard',
+      'https://getringa.ca/og-image.jpg',
+      'Ringa',
+    ],
+    [
+      'ringa-professional',
+      'Ringa Professional Plan',
+      'AI receptionist for plumbing & HVAC businesses with multiple locations or business lines. Everything in Starter plus 3 dedicated phone numbers and 3 AI receptionists.',
+      'in stock',
+      'new',
+      '599.00 CAD',
+      'https://getringa.ca/onboard',
+      'https://getringa.ca/og-image.jpg',
+      'Ringa',
+    ],
+    [
+      'ringa-enterprise',
+      'Ringa Enterprise Plan',
+      'AI receptionist for large plumbing & HVAC operations. Everything in Professional plus 5 dedicated phone numbers and 5 AI receptionists across multiple locations.',
+      'in stock',
+      'new',
+      '799.00 CAD',
+      'https://getringa.ca/onboard',
+      'https://getringa.ca/og-image.jpg',
+      'Ringa',
+    ],
+  ];
+
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  res.set('Content-Type', 'text/csv').send(csv);
+});
+
 legalRouter.get('/terms', (_req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="en">
