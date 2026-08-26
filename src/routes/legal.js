@@ -13,7 +13,7 @@ legalRouter.get('/catalog.csv', (_req, res) => {
       'new',
       '399.00 CAD',
       'https://getringa.ca/onboard',
-      'https://getringa.ca/og-image.jpg',
+      'https://getringa.ca/images/pricing-starter.png',
       'Ringa',
     ],
     [
@@ -24,7 +24,7 @@ legalRouter.get('/catalog.csv', (_req, res) => {
       'new',
       '599.00 CAD',
       'https://getringa.ca/onboard',
-      'https://getringa.ca/og-image.jpg',
+      'https://getringa.ca/images/pricing-professional.png',
       'Ringa',
     ],
     [
@@ -35,7 +35,7 @@ legalRouter.get('/catalog.csv', (_req, res) => {
       'new',
       '799.00 CAD',
       'https://getringa.ca/onboard',
-      'https://getringa.ca/og-image.jpg',
+      'https://getringa.ca/images/pricing-enterprise.png',
       'Ringa',
     ],
   ];

@@ -21,6 +21,7 @@ app.use('/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWeb
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 app.use('/webhooks/vapi', vapiWebhookRouter);
