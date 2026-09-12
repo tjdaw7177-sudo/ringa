@@ -1,6 +1,19 @@
 node_modules/
 .env
 .env.local
+.env.txt
 dist/
 *.log
 .DS_Store
+
+# local tool config
+.agents/
+.claude/
+skills-lock.json
+
+# outreach / lead data (not app code, not for a public repo)
+designpro-outreach/
+outreach-drafts/
+leads-*.csv
+leads-*.xlsx
+*Call List & Script.xlsx
