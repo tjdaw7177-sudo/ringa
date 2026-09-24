@@ -30,11 +30,11 @@ landingRouter.get('/', (_req, res) => {
   t.src=v;s=b.getElementsByTagName(e)[0];
   s.parentNode.insertBefore(t,s)}(window, document,'script',
   'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '2796649857452739');
+  fbq('init', '1127145183078310');
   fbq('track', 'PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=2796649857452739&ev=PageView&noscript=1"
+  src="https://www.facebook.com/tr?id=1127145183078310&ev=PageView&noscript=1"
   /></noscript>
   <!-- End Meta Pixel Code -->
   <script src="https://cdn.tailwindcss.com"></script>
