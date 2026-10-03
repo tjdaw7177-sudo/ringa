@@ -25,9 +25,6 @@
     "uuid": "^14.0.1",
     "zod": "^3.23.0"
   },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
-  },
   "engines": {
     "node": "22.x"
   }
