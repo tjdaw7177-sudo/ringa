@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import twilio from 'twilio';
+import { v4 as uuidv4 } from 'uuid';
 import sql from '../db/index.js';
 import { portalWelcomeEmail } from '../services/email.js';
 
@@ -193,6 +194,141 @@ adminRouter.post('/activate', requireOwner, async (req, res) => {
   await sql`UPDATE clients SET status = 'active' WHERE id = ${clientId}`;
   console.log('[admin] activated client:', clientId);
   res.redirect(`/admin?secret=${req.query.secret}`);
+});
+
+const DEFAULT_HOURS = {
+  "0": null,
+  "1": { "open": 8, "close": 17 },
+  "2": { "open": 8, "close": 17 },
+  "3": { "open": 8, "close": 17 },
+  "4": { "open": 8, "close": 17 },
+  "5": { "open": 8, "close": 17 },
+  "6": { "open": 8, "close": 12 }
+};
+
+// One-off provisioning for an internal/demo client — same Twilio + Vapi
+// wiring as /onboard, minus the Stripe subscription, since this isn't a
+// paying customer. Reuses an existing Twilio number rather than buying one.
+adminRouter.post('/create-demo', requireOwner, async (req, res) => {
+  const { businessName, twilioNumber, emergencyNumber, calendarId, refreshToken } = req.body;
+  if (!businessName || !twilioNumber || !emergencyNumber || !calendarId || !refreshToken) {
+    return res.status(400).json({ error: 'businessName, twilioNumber, emergencyNumber, calendarId, and refreshToken are all required' });
+  }
+
+  try {
+    const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    const numbers = await twilioClient.incomingPhoneNumbers.list({ phoneNumber: twilioNumber });
+    if (!numbers.length) throw new Error(`Twilio number ${twilioNumber} not found in this account`);
+    await twilioClient.incomingPhoneNumbers(numbers[0].sid).update({
+      smsUrl: `${process.env.APP_URL}/webhooks/twilio/sms`,
+    });
+    console.log('[admin] reconfigured twilio number for demo:', twilioNumber);
+
+    const vapiRes = await fetch('https://api.vapi.ai/assistant', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.VAPI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: `${businessName} Receptionist`,
+        model: {
+          provider: 'anthropic',
+          model: 'claude-sonnet-4-6',
+          messages: [{
+            role: 'system',
+            content: `You are a warm, professional receptionist for ${businessName}, a plumbing and HVAC company. You answer calls naturally, like a real person would — not robotic, not scripted.
+
+Your job:
+1. Answer warmly and find out what the caller needs
+2. If it sounds like an emergency — gas leak, flooding, no heat in winter, burst pipe — act fast. Get their name, address, and what's happening, then call dispatchEmergency right away. Don't make them wait.
+3. For regular service requests — leaky faucets, furnace tune-up, installation, etc. — collect their name, best callback number, service address, what they need done, and a preferred date and time. Then call bookAppointment.
+4. Always read back the details before booking so they can confirm.
+5. If they just have a question you can't answer, take their name and number and let them know someone will call them back.
+
+Tone: friendly, calm, efficient. Keep responses short — this is a phone call, not an email. Never say "certainly" or "absolutely". Sound like a real person.`,
+          }],
+          tools: [
+            {
+              type: 'function',
+              function: {
+                name: 'bookAppointment',
+                description: 'Book a service appointment on the business calendar',
+                parameters: {
+                  type: 'object',
+                  properties: {
+                    CustomerName: { type: 'string' },
+                    Phone: { type: 'string' },
+                    serviceType: { type: 'string' },
+                    address: { type: 'string' },
+                    startTime: { type: 'string' },
+                  },
+                  required: ['CustomerName', 'Phone', 'serviceType', 'address', 'startTime'],
+                },
+              },
+            },
+            {
+              type: 'function',
+              function: {
+                name: 'dispatchEmergency',
+                description: 'Alert the on-call technician for an emergency',
+                parameters: {
+                  type: 'object',
+                  properties: {
+                    customerName: { type: 'string' },
+                    phone: { type: 'string' },
+                    address: { type: 'string' },
+                    issue: { type: 'string' },
+                  },
+                  required: ['customerName', 'phone', 'address', 'issue'],
+                },
+              },
+            },
+          ],
+        },
+        voice: { provider: '11labs', voiceId: 'jessica' },
+        firstMessage: `Thank you for calling ${businessName}! This call may be recorded. How can I help you today?`,
+        serverUrl: `${process.env.APP_URL}/webhooks/vapi`,
+      }),
+    });
+    const vapiAssistant = await vapiRes.json();
+    if (!vapiAssistant.id) throw new Error(`Vapi assistant creation failed: ${JSON.stringify(vapiAssistant)}`);
+    console.log('[admin] created demo Vapi assistant:', vapiAssistant.id);
+
+    const vapiImportRes = await fetch('https://api.vapi.ai/phone-number', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.VAPI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        provider: 'twilio',
+        number: twilioNumber,
+        twilioAccountSid: process.env.TWILIO_ACCOUNT_SID,
+        twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
+        assistantId: vapiAssistant.id,
+      }),
+    });
+    const vapiPhone = await vapiImportRes.json();
+    if (!vapiPhone.id) throw new Error(`Vapi phone import failed: ${JSON.stringify(vapiPhone)}`);
+    console.log('[admin] imported demo phone into Vapi:', vapiPhone.id);
+
+    const clientId = uuidv4();
+    await sql`
+      INSERT INTO clients (id, business_name, timezone, emergency_number, business_hours, google_calendar_id, google_refresh_token, status)
+      VALUES (${clientId}, ${businessName}, 'America/Vancouver', ${emergencyNumber}, ${JSON.stringify(DEFAULT_HOURS)}, ${calendarId}, ${refreshToken}, 'active')
+    `;
+    await sql`
+      INSERT INTO phone_numbers (id, client_id, twilio_phone_number, vapi_phone_number_id, vapi_assistant_id, label)
+      VALUES (${uuidv4()}, ${clientId}, ${twilioNumber}, ${vapiPhone.id}, ${vapiAssistant.id}, 'Demo')
+    `;
+    console.log('[admin] demo client created:', clientId);
+
+    res.json({ success: true, clientId, twilioNumber, vapiAssistantId: vapiAssistant.id });
+  } catch (err) {
+    console.error('[admin] create-demo failed:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 adminRouter.get('/email-preview', requireOwner, (req, res) => {
