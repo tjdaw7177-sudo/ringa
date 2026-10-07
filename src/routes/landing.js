@@ -94,7 +94,7 @@ landingRouter.get('/', (_req, res) => {
           class="accent-bg hover:bg-sky-400 text-black font-bold px-8 py-4 rounded-xl text-lg transition-colors">
           Start Free Trial
         </a>
-        <a href="tel:[DEMO_NUMBER]"
+        <a href="tel:+12368571204"
           class="border border-gray-600 hover:border-gray-400 text-gray-300 font-semibold px-8 py-4 rounded-xl text-lg transition-colors">
           Call the Demo Line
         </a>
@@ -112,11 +112,11 @@ landingRouter.get('/', (_req, res) => {
     <div class="max-w-2xl mx-auto metallic-card rounded-2xl p-8">
       <h2 class="text-2xl font-extrabold mb-3">Hear it yourself</h2>
       <p class="text-gray-400 mb-6">
-        Call <a href="tel:[DEMO_NUMBER]" class="accent font-semibold hover:underline">[DEMO NUMBER]</a> and pretend your basement is flooding. Ringa will answer just like it would for your customers.
+        Call <a href="tel:+12368571204" class="accent font-semibold hover:underline">+1 (236) 857-1204</a> and pretend your basement is flooding. Ringa will answer just like it would for your customers.
       </p>
-      <a href="tel:[DEMO_NUMBER]"
+      <a href="tel:+12368571204"
         class="inline-block accent-bg hover:bg-sky-400 text-black font-bold px-8 py-3 rounded-xl transition-colors">
-        Call [DEMO NUMBER]
+        Call +1 (236) 857-1204
       </a>
     </div>
   </section>
