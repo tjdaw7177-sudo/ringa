@@ -483,6 +483,12 @@ Tone: friendly, calm, efficient. Keep responses short — this is a phone call, 
     console.log('[onboard] imported phone into Vapi:', vapiPhone.id);
     if (!vapiPhone.id) throw new Error(`Vapi phone import failed: ${JSON.stringify(vapiPhone)}`);
 
+    // Vapi's import overwrites the Twilio number's smsUrl to point at itself —
+    // reclaim it so REMOVE/RESCHEDULE replies still reach our own handler.
+    await twilioClient.incomingPhoneNumbers(purchased.sid).update({
+      smsUrl: `${process.env.APP_URL}/webhooks/twilio/sms`,
+    });
+
     // Save everything to DB
     await sql`
       UPDATE clients SET

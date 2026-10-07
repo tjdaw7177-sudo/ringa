@@ -292,6 +292,12 @@ portalRouter.post('/add-number', requireClient, async (req, res) => {
     });
     const vapiPhone = await vapiImportRes.json();
 
+    // Vapi's import overwrites the Twilio number's smsUrl to point at itself —
+    // reclaim it so REMOVE/RESCHEDULE replies still reach our own handler.
+    await twilioClient.incomingPhoneNumbers(purchased.sid).update({
+      smsUrl: `${process.env.APP_URL}/webhooks/twilio/sms`,
+    });
+
     await sql`
       INSERT INTO phone_numbers (id, client_id, twilio_phone_number, vapi_phone_number_id, vapi_assistant_id, label)
       VALUES (${uuidv4()}, ${client.id}, ${purchased.phoneNumber}, ${vapiPhone.id}, ${vapiAssistant.id}, ${`Location ${phoneNumbers.length + 1}`})

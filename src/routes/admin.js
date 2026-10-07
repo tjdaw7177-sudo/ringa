@@ -313,6 +313,12 @@ Tone: friendly, calm, efficient. Keep responses short — this is a phone call, 
     if (!vapiPhone.id) throw new Error(`Vapi phone import failed: ${JSON.stringify(vapiPhone)}`);
     console.log('[admin] imported demo phone into Vapi:', vapiPhone.id);
 
+    // Vapi's import overwrites the Twilio number's smsUrl to point at itself —
+    // reclaim it so REMOVE/RESCHEDULE replies still reach our own handler.
+    await twilioClient.incomingPhoneNumbers(numbers[0].sid).update({
+      smsUrl: `${process.env.APP_URL}/webhooks/twilio/sms`,
+    });
+
     const clientId = uuidv4();
     await sql`
       INSERT INTO clients (id, business_name, timezone, emergency_number, business_hours, google_calendar_id, google_refresh_token, status)
