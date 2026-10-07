@@ -9,17 +9,17 @@ landingRouter.get('/', (_req, res) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ringa — AI Receptionist for Plumbing & HVAC</title>
-  <meta name="description" content="Ringa answers every call, books appointments into your Google Calendar, sends SMS reminders, and dispatches emergencies — 24/7. Built for plumbing and HVAC businesses in Canada.">
+  <meta name="description" content="Ringa answers every call, books appointments into your Google Calendar, sends SMS reminders, and dispatches emergencies — 24/7. Built for plumbing and HVAC businesses in Victoria, BC and across Vancouver Island.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://getringa.ca">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://getringa.ca">
   <meta property="og:title" content="Ringa — AI Receptionist for Plumbing & HVAC">
-  <meta property="og:description" content="Never miss a call again. Ringa answers 24/7, books appointments, and handles emergencies — so you can focus on the job.">
+  <meta property="og:description" content="Never miss a call again. Ringa answers 24/7, books appointments, and handles emergencies — built for plumbing and HVAC businesses in Victoria, BC and across Vancouver Island.">
   <meta property="og:site_name" content="Ringa">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Ringa — AI Receptionist for Plumbing & HVAC">
-  <meta name="twitter:description" content="Never miss a call again. Ringa answers 24/7, books appointments, and handles emergencies — so you can focus on the job.">
+  <meta name="twitter:description" content="Never miss a call again. Ringa answers 24/7, books appointments, and handles emergencies — built for plumbing and HVAC businesses in Victoria, BC and across Vancouver Island.">
   <!-- Meta Pixel Code -->
   <script>
   !function(f,b,e,v,n,t,s)
@@ -81,7 +81,7 @@ landingRouter.get('/', (_req, res) => {
   <section class="pt-32 pb-24 px-6 text-center">
     <div class="max-w-3xl mx-auto">
       <div class="inline-block bg-sky-900/40 text-sky-300 text-sm font-semibold px-4 py-1.5 rounded-full mb-6 border border-sky-700/40">
-        Built for Plumbing & HVAC
+        Built for Plumbing & HVAC in Victoria, BC
       </div>
       <h1 class="text-5xl sm:text-6xl font-extrabold leading-tight mb-6">
         Your business, <span class="accent">always open</span>
@@ -94,6 +94,10 @@ landingRouter.get('/', (_req, res) => {
           class="accent-bg hover:bg-sky-400 text-black font-bold px-8 py-4 rounded-xl text-lg transition-colors">
           Start Free Trial
         </a>
+        <a href="tel:[DEMO_NUMBER]"
+          class="border border-gray-600 hover:border-gray-400 text-gray-300 font-semibold px-8 py-4 rounded-xl text-lg transition-colors">
+          Call the Demo Line
+        </a>
         <a href="#how-it-works"
           class="border border-gray-600 hover:border-gray-400 text-gray-300 font-semibold px-8 py-4 rounded-xl text-lg transition-colors">
           See How It Works
@@ -103,9 +107,23 @@ landingRouter.get('/', (_req, res) => {
     </div>
   </section>
 
+  <!-- Hear it yourself -->
+  <section class="pb-16 px-6 text-center">
+    <div class="max-w-2xl mx-auto metallic-card rounded-2xl p-8">
+      <h2 class="text-2xl font-extrabold mb-3">Hear it yourself</h2>
+      <p class="text-gray-400 mb-6">
+        Call <a href="tel:[DEMO_NUMBER]" class="accent font-semibold hover:underline">[DEMO NUMBER]</a> and pretend your basement is flooding. Ringa will answer just like it would for your customers.
+      </p>
+      <a href="tel:[DEMO_NUMBER]"
+        class="inline-block accent-bg hover:bg-sky-400 text-black font-bold px-8 py-3 rounded-xl transition-colors">
+        Call [DEMO NUMBER]
+      </a>
+    </div>
+  </section>
+
   <!-- Social proof bar -->
   <section class="border-y border-gray-800 py-8 px-6" style="background:rgba(255,255,255,0.02)">
-    <div class="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+    <div class="max-w-md mx-auto grid grid-cols-2 gap-6 text-center">
       <div>
         <p class="text-3xl font-extrabold accent">24/7</p>
         <p class="text-sm text-gray-500 mt-1">Always answers</p>
@@ -114,60 +132,23 @@ landingRouter.get('/', (_req, res) => {
         <p class="text-3xl font-extrabold accent">&lt;2 min</p>
         <p class="text-sm text-gray-500 mt-1">Setup time</p>
       </div>
-      <div>
-        <p class="text-3xl font-extrabold accent">0</p>
-        <p class="text-sm text-gray-500 mt-1">Missed calls</p>
-      </div>
-      <div>
-        <p class="text-3xl font-extrabold accent">100%</p>
-        <p class="text-sm text-gray-500 mt-1">Automated booking</p>
-      </div>
     </div>
   </section>
 
-  <!-- Testimonials -->
+  <!-- Founding Customer -->
   <section class="py-24 px-6 border-t border-gray-800">
-    <div class="max-w-5xl mx-auto">
-      <div class="text-center mb-12">
-        <h2 class="text-4xl font-extrabold">What business owners are saying</h2>
-        <p class="text-gray-500 mt-3 text-lg">Real results from plumbing and HVAC companies using Ringa</p>
+    <div class="max-w-2xl mx-auto text-center metallic-card rounded-2xl p-10">
+      <div class="inline-block bg-sky-900/40 text-sky-300 text-xs font-semibold px-3 py-1 rounded-full mb-5 border border-sky-700/40">
+        Founding Customer
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-
-        <div class="metallic-card rounded-2xl p-7">
-          <div class="flex gap-1 mb-4">
-            ${'★'.repeat(5).split('').map(() => '<span class="text-yellow-400">★</span>').join('')}
-          </div>
-          <p class="text-gray-300 text-sm leading-relaxed mb-5">"I used to miss 4 or 5 calls a day while I was on a job. Since getting Ringa, every one of those calls turns into a booked appointment. It paid for itself in the first week."</p>
-          <div>
-            <p class="font-bold text-white text-sm">Mike T.</p>
-            <p class="text-gray-600 text-xs">Owner, T&S Plumbing — Surrey, BC</p>
-          </div>
-        </div>
-
-        <div class="metallic-card rounded-2xl p-7">
-          <div class="flex gap-1 mb-4">
-            ${'★'.repeat(5).split('').map(() => '<span class="text-yellow-400">★</span>').join('')}
-          </div>
-          <p class="text-gray-300 text-sm leading-relaxed mb-5">"My customers are always surprised how smooth it is. Ringa books the appointment, sends them a text, and reminds them the next day. I don't have to do anything."</p>
-          <div>
-            <p class="font-bold text-white text-sm">Sandra L.</p>
-            <p class="text-gray-600 text-xs">Owner, Comfort HVAC — Burnaby, BC</p>
-          </div>
-        </div>
-
-        <div class="metallic-card rounded-2xl p-7">
-          <div class="flex gap-1 mb-4">
-            ${'★'.repeat(5).split('').map(() => '<span class="text-yellow-400">★</span>').join('')}
-          </div>
-          <p class="text-gray-300 text-sm leading-relaxed mb-5">"We had a gas leak call at 2am on a Saturday. Ringa caught it, recognized it as an emergency, and texted my on-call guy immediately. That's exactly what we needed."</p>
-          <div>
-            <p class="font-bold text-white text-sm">Dave K.</p>
-            <p class="text-gray-600 text-xs">Owner, Kwik Plumbing — Langley, BC</p>
-          </div>
-        </div>
-
-      </div>
+      <h2 class="text-3xl font-extrabold mb-4">We're onboarding our first Victoria contractors</h2>
+      <p class="text-gray-400 mb-8 text-lg">
+        Founding customers get <span class="accent font-semibold">[FOUNDING PRICE]/month</span> locked in for 12 months in exchange for honest feedback.
+      </p>
+      <a href="/onboard"
+        class="inline-block accent-bg hover:bg-sky-400 text-black font-bold px-8 py-4 rounded-xl text-lg transition-colors">
+        Become a Founding Customer
+      </a>
     </div>
   </section>
 
@@ -209,7 +190,7 @@ landingRouter.get('/', (_req, res) => {
         ${[
           ['📞', 'Answers Every Call', 'Your AI receptionist picks up 24/7, even on evenings and weekends when your team is off.'],
           ['📅', 'Books Appointments', 'Collects customer info and books directly into your Google Calendar — no double-booking.'],
-          ['🚨', 'Emergency Dispatch', 'Gas leaks, flooding, no heat — Ringa identifies emergencies and texts your on-call tech instantly.'],
+          ['🚨', 'Emergency Dispatch', "Ringa immediately texts your designated on-call number with the customer's name, address and issue."],
           ['💬', 'SMS Confirmations', 'Customers get an instant text confirmation with their appointment details after booking.'],
           ['⏰', 'Reminder Texts', 'Automatic reminders sent 24 hours before each appointment to reduce no-shows.'],
           ['🕐', 'Business Hours', "Ringa knows when you're open and only books during your working hours."],
@@ -223,6 +204,37 @@ landingRouter.get('/', (_req, res) => {
     </div>
   </section>
 
+  <!-- ROI -->
+  <section class="py-24 px-6 border-t border-gray-800" style="background:rgba(255,255,255,0.02)">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Worth the price?</h2>
+      <p class="text-gray-400 text-lg mb-12">One missed water heater job can cost you $500+. Ringa costs less than one lost job a month.</p>
+
+      <div class="metallic-card rounded-2xl p-8 text-left">
+        <h3 class="text-lg font-bold text-white mb-6 text-center">What are missed calls costing you?</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-sm text-gray-400 mb-2" for="roi-missed-calls">Missed calls per week</label>
+            <input id="roi-missed-calls" type="number" min="0" step="1" placeholder="e.g. 5" oninput="ringaCalcROI()"
+              class="w-full bg-zinc-800 border border-zinc-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-sky-500">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2" for="roi-job-value">Average job value ($)</label>
+            <input id="roi-job-value" type="number" min="0" step="1" placeholder="e.g. 300" oninput="ringaCalcROI()"
+              class="w-full bg-zinc-800 border border-zinc-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-sky-500">
+          </div>
+        </div>
+
+        <div class="border-t border-zinc-800 pt-6 text-center">
+          <p class="text-sm text-gray-500 mb-1">Estimated revenue lost per month</p>
+          <p id="roi-result" class="text-4xl font-extrabold accent mb-2">$0</p>
+          <p class="text-xs text-gray-600 mb-6">Assumes half of missed calls would have booked — a simple estimate, not a guarantee.</p>
+          <p id="roi-compare" class="text-sm text-gray-400"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Pricing -->
   <section id="pricing" class="py-24 px-6">
     <div class="max-w-5xl mx-auto">
@@ -232,9 +244,11 @@ landingRouter.get('/', (_req, res) => {
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
 
-        <div class="metallic-card rounded-2xl p-8">
+        <div class="metallic-card rounded-2xl p-8 relative">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 accent-bg text-black text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">Best for owner-operators</div>
           <h3 class="text-xl font-bold text-white">Starter</h3>
-          <p class="text-4xl font-extrabold text-white mt-4">$399<span class="text-base font-normal text-gray-500">/mo</span></p>
+          <p class="text-sm text-gray-500 mt-1">Solo operators and small crews.</p>
+          <p class="text-4xl font-extrabold text-white mt-4">$399 CAD<span class="text-base font-normal text-gray-500">/mo</span></p>
           <ul class="mt-6 space-y-3 text-sm text-gray-400">
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 1 AI receptionist</li>
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 1 dedicated phone number</li>
@@ -248,13 +262,12 @@ landingRouter.get('/', (_req, res) => {
         </div>
 
         <div class="rounded-2xl p-8 relative border-2 border-sky-500" style="background: linear-gradient(145deg, #0c1f2e, #0a1520);">
-          <div class="absolute -top-3 left-1/2 -translate-x-1/2 accent-bg text-black text-xs font-bold px-4 py-1 rounded-full">Most Popular</div>
           <h3 class="text-xl font-bold text-white">Professional</h3>
-          <p class="text-4xl font-extrabold text-white mt-4">$599<span class="text-base font-normal text-gray-500">/mo</span></p>
+          <p class="text-sm text-gray-500 mt-1">Growing shops with multiple lines or trucks, up to 3 numbers.</p>
+          <p class="text-4xl font-extrabold text-white mt-4">$599 CAD<span class="text-base font-normal text-gray-500">/mo</span></p>
           <ul class="mt-6 space-y-3 text-sm text-gray-400">
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 3 AI receptionists</li>
-            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 3 dedicated phone numbers</li>
-            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Run multiple businesses</li>
+            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Up to 3 locations or numbers</li>
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Everything in Starter</li>
           </ul>
           <a href="/onboard" class="mt-8 block text-center accent-bg hover:bg-sky-400 text-black font-bold py-3 rounded-xl transition-colors">
@@ -264,11 +277,11 @@ landingRouter.get('/', (_req, res) => {
 
         <div class="metallic-card rounded-2xl p-8">
           <h3 class="text-xl font-bold text-white">Enterprise</h3>
-          <p class="text-4xl font-extrabold text-white mt-4">$799<span class="text-base font-normal text-gray-500">/mo</span></p>
+          <p class="text-sm text-gray-500 mt-1">Multi-location companies, 5+ numbers.</p>
+          <p class="text-4xl font-extrabold text-white mt-4">$799 CAD<span class="text-base font-normal text-gray-500">/mo</span></p>
           <ul class="mt-6 space-y-3 text-sm text-gray-400">
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 5+ AI receptionists</li>
-            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 5+ dedicated phone numbers</li>
-            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Multiple locations</li>
+            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 5+ locations or numbers</li>
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Everything in Professional</li>
           </ul>
           <a href="/onboard" class="mt-8 block text-center border border-sky-500 text-sky-400 hover:bg-sky-500 hover:text-black font-semibold py-3 rounded-xl transition-colors">
@@ -277,6 +290,8 @@ landingRouter.get('/', (_req, res) => {
         </div>
 
       </div>
+
+      <p class="text-center text-sm text-gray-500 mt-8">All plans include [UNLIMITED MINUTES OR LIMIT] call minutes.</p>
 
       <!-- What's included detail -->
       <div class="mt-16 metallic-card rounded-2xl p-8 border border-zinc-800">
@@ -319,7 +334,7 @@ landingRouter.get('/', (_req, res) => {
             <div class="text-2xl flex-shrink-0">🚨</div>
             <div>
               <p class="font-bold text-white mb-1">Handles emergencies instantly</p>
-              <p class="text-gray-500 text-sm">If a customer calls with a gas leak, flooding, or no heat — Ringa recognizes it as an emergency and immediately texts your on-call technician with the customer's name, address, and problem.</p>
+              <p class="text-gray-500 text-sm">Ringa immediately texts your designated on-call number with the customer's name, address and issue.</p>
             </div>
           </div>
 
@@ -327,7 +342,7 @@ landingRouter.get('/', (_req, res) => {
             <div class="text-2xl flex-shrink-0">🕐</div>
             <div>
               <p class="font-bold text-white mb-1">Respects your business hours</p>
-              <p class="text-gray-500 text-sm">Ringa only books appointments during your open hours. Try to book on a Sunday? It'll let the customer know when you're available next.</p>
+              <p class="text-gray-500 text-sm">By default, Ringa books Mon–Fri 8am–5pm and Sat 8am–12pm. Try to book outside those hours? It'll let the customer know when you're available next. You can change your hours [HOW: in your portal / by contacting us].</p>
             </div>
           </div>
 
@@ -335,7 +350,7 @@ landingRouter.get('/', (_req, res) => {
             <div class="text-2xl flex-shrink-0">📋</div>
             <div>
               <p class="font-bold text-white mb-1">Full call transcripts in your portal</p>
-              <p class="text-gray-500 text-sm">Every call is recorded and transcribed. Log into your portal any time to read a full summary of what was discussed on every call.</p>
+              <p class="text-gray-500 text-sm">Every call is recorded and transcribed — callers hear a brief notice at the start of the call. Log into your portal any time to read a full summary of what was discussed on every call.</p>
             </div>
           </div>
 
@@ -364,13 +379,15 @@ landingRouter.get('/', (_req, res) => {
 
         ${[
           ['Do I need any technical knowledge to set up Ringa?', 'No. You fill out a short form, connect your Google Calendar with one click, and you\'re done. The whole thing takes under 2 minutes. We handle everything else.'],
-          ['How does the AI know when I\'m available?', 'By default, Ringa books appointments Monday–Friday 8am–5pm and Saturday 8am–12pm. If someone calls outside those hours, Ringa lets them know when you\'re next available.'],
-          ['What happens if someone calls with an emergency?', 'Ringa recognizes emergency situations — gas leaks, flooding, no heat — and immediately sends an urgent text to your business phone number with the customer\'s name, address, and issue.'],
+          ['How does the AI know when I\'m available?', 'By default, Ringa books Mon–Fri 8am–5pm and Sat 8am–12pm. You can change your hours [HOW: in your portal / by contacting us]. If someone calls outside those hours, Ringa lets them know when you\'re next available.'],
+          ['What happens if someone calls with an emergency?', 'Ringa immediately texts your designated on-call number with the customer\'s name, address and issue.'],
           ['Do my customers know they\'re talking to an AI?', 'Ringa sounds natural and professional. Most customers don\'t ask, but if they do, Ringa is honest. The goal is to make the experience as smooth as a real receptionist.'],
           ['What if I already have a business phone number?', 'You keep your existing number. Simply forward your calls to your Ringa number and Ringa handles everything from there. You can turn forwarding on or off any time.'],
           ['Can I cancel any time?', 'Yes. Cancel any time from your Stripe billing portal. No cancellation fees, no contracts. Your number stays active until the end of your billing period.'],
           ['What happens during my 7-day free trial?', 'You get full access to everything — your AI receptionist is live, calls are answered, appointments are booked. Your card is on file but you won\'t be charged until day 8.'],
-          ['Can I use Ringa for multiple locations?', 'Yes. The Professional plan supports up to 3 locations and the Enterprise plan supports 5+. Each location gets its own dedicated phone number and AI receptionist.'],
+          ['Can I use Ringa for multiple locations?', 'Yes. The Professional plan supports up to 3 locations or numbers, and the Enterprise plan supports 5+. Each location gets its own dedicated phone number and AI receptionist.'],
+          ['Does Ringa work with Jobber, Housecall Pro or ServiceTitan?', 'Ringa currently books into Google Calendar. [INTEGRATION STATUS, e.g. Jobber and Housecall Pro integrations are on our roadmap — let us know which you use.]'],
+          ['Are calls recorded?', 'Yes. Calls are recorded and transcribed so you can review them in your portal. Callers hear a brief notice at the start of each call that the call may be recorded.'],
         ].map(([q, a]) => `
         <details class="metallic-card rounded-xl group">
           <summary class="px-6 py-5 cursor-pointer flex items-center justify-between font-semibold text-white select-none list-none">
@@ -390,6 +407,7 @@ landingRouter.get('/', (_req, res) => {
       <div class="text-center mb-12">
         <h2 class="text-4xl font-extrabold">Have questions? We're here.</h2>
         <p class="text-gray-500 mt-3 text-lg">Talk to a real person before you sign up — no pressure, no sales pitch.</p>
+        <p class="text-gray-400 mt-4">Locally owned and operated in Victoria. Talk to a real person, not a call centre.</p>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
@@ -431,6 +449,24 @@ landingRouter.get('/', (_req, res) => {
   <footer class="py-8 px-6 border-t border-gray-800 text-center text-sm text-gray-600">
     <p>&copy; 2026 <span class="logo-ring">Ring</span><span class="logo-a">a</span> &nbsp;·&nbsp; <a href="/terms" class="hover:text-gray-400 transition-colors">Terms of Service</a> &nbsp;·&nbsp; <a href="/privacy" class="hover:text-gray-400 transition-colors">Privacy Policy</a></p>
   </footer>
+
+  <script>
+    function ringaCalcROI() {
+      const calls = parseFloat(document.getElementById('roi-missed-calls').value) || 0;
+      const jobValue = parseFloat(document.getElementById('roi-job-value').value) || 0;
+      const lost = calls * 4.3 * jobValue * 0.5;
+      const rounded = Math.round(lost);
+      document.getElementById('roi-result').textContent = '$' + rounded.toLocaleString();
+      const compareEl = document.getElementById('roi-compare');
+      if (calls > 0 && jobValue > 0) {
+        compareEl.textContent = rounded > 399
+          ? "That's more than Ringa's Starter plan at $399 CAD/month."
+          : "Compare that to Ringa's Starter plan at $399 CAD/month.";
+      } else {
+        compareEl.textContent = '';
+      }
+    }
+  </script>
 
 </body>
 </html>`);
