@@ -10,7 +10,7 @@ function requireOwner(req, res, next) {
   if (secret !== process.env.OWNER_SECRET) {
     return res.status(401).send(`<!DOCTYPE html>
 <html><head><title>Ringa Admin</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="/styles.css">
 <style>body{background:#0a0a0a;font-family:Inter,sans-serif}</style>
 </head>
 <body class="min-h-screen flex items-center justify-center">
@@ -66,7 +66,7 @@ adminRouter.get('/', requireOwner, async (req, res) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ringa Admin</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     body { font-family: 'Inter', sans-serif; background: #0a0a0a; }

@@ -33,7 +33,7 @@ onboardRouter.get('/', (req, res) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ringa — Get Started</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
   <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-2xl">
@@ -269,7 +269,7 @@ onboardRouter.get('/owner', (req, res) => {
 <head>
   <meta charset="UTF-8">
   <title>Ringa — Owner Setup</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
   <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-lg">
@@ -525,7 +525,7 @@ Tone: friendly, calm, efficient. Keep responses short — this is a phone call, 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ringa — You're Live!</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css">
   <script>
   !function(f,b,e,v,n,t,s)
   {if(f.fbq)return;n=f.fbq=function(){n.callMethod?

@@ -25,7 +25,7 @@ portalRouter.get('/login', (req, res) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ringa — Client Portal</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css">
   <style>body { font-family: Inter, sans-serif; background: #0a0a0a; }</style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -89,7 +89,7 @@ portalRouter.get('/', requireClient, async (req, res) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ringa Portal — ${client.business_name}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     body { font-family: 'Inter', sans-serif; background: #0a0a0a; }
