@@ -27,6 +27,7 @@ const DEFAULT_HOURS = {
 
 // Step 1 — show onboarding form
 onboardRouter.get('/', (req, res) => {
+  const isFounders = req.query.plan === 'founders';
   res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,6 +47,23 @@ onboardRouter.get('/', (req, res) => {
 
       <!-- Plan selection -->
       <div>
+        ${isFounders ? `
+        <p class="text-sm font-semibold text-gray-700 mb-3">Your plan</p>
+        <input type="hidden" name="priceId" value="${process.env.FOUNDERS_STRIPE}">
+        <div class="border-2 border-blue-500 bg-blue-50 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-1">
+            <p class="font-bold text-gray-900 text-lg">Founding Customer</p>
+            <span class="text-xs bg-blue-600 text-white font-semibold px-2 py-0.5 rounded-full">Locked 12 months</span>
+          </div>
+          <p class="text-2xl font-extrabold text-blue-600 mt-1">$199 CAD<span class="text-sm font-normal text-gray-400">/mo</span></p>
+          <ul class="mt-3 space-y-1 text-sm text-gray-600">
+            <li>✓ 1 AI receptionist</li>
+            <li>✓ 1 phone number</li>
+            <li>✓ Appointment booking</li>
+            <li>✓ Emergency dispatch</li>
+            <li>✓ SMS reminders</li>
+          </ul>
+        </div>` : `
         <p class="text-sm font-semibold text-gray-700 mb-3">Choose your plan</p>
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
 
@@ -95,7 +113,7 @@ onboardRouter.get('/', (req, res) => {
             </div>
           </label>
 
-        </div>
+        </div>`}
       </div>
 
       <!-- Business details -->
@@ -176,6 +194,7 @@ onboardRouter.post('/submit', async (req, res) => {
       process.env.STRIPE_PRICE_ID_TIER1,
       process.env.STRIPE_PRICE_ID_TIER2,
       process.env.STRIPE_PRICE_ID_TIER3,
+      process.env.FOUNDERS_STRIPE,
     ];
     if (!validPriceIds.includes(priceId)) {
       return res.status(400).send('Invalid plan selected.');

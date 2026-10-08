@@ -167,6 +167,41 @@ portalRouter.get('/', requireClient, async (req, res) => {
       </div>
     </div>
 
+    <!-- Business hours -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden mb-6">
+      <div class="px-6 py-4 border-b border-zinc-800">
+        <h2 class="font-bold text-white">Business Hours</h2>
+        <p class="text-zinc-500 text-sm mt-0.5">Ringa only books appointments during these hours — uncheck a day to mark it closed</p>
+      </div>
+      <form method="POST" action="/portal/hours?token=${req.portalToken}" class="px-6 py-5">
+        <div class="space-y-3">
+          ${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((dayName, i) => {
+            const day = client.business_hours?.[String(i)];
+            const isOpen = !!day;
+            const hourOptions = (selected) => Array.from({ length: 24 }, (_, h) => `<option value="${h}" ${h === selected ? 'selected' : ''}>${h === 0 ? '12am' : h < 12 ? h + 'am' : h === 12 ? '12pm' : (h - 12) + 'pm'}</option>`).join('');
+            return `
+          <div class="flex items-center gap-4">
+            <label class="flex items-center gap-2 w-32 flex-shrink-0">
+              <input type="checkbox" name="open_${i}" ${isOpen ? 'checked' : ''} class="accent-sky-400 w-4 h-4">
+              <span class="text-sm text-zinc-300">${dayName}</span>
+            </label>
+            <select name="start_${i}" class="bg-zinc-800 border border-zinc-600 text-white rounded-lg px-3 py-1.5 text-sm">
+              ${hourOptions(day?.open ?? 8)}
+            </select>
+            <span class="text-zinc-500 text-sm">to</span>
+            <select name="end_${i}" class="bg-zinc-800 border border-zinc-600 text-white rounded-lg px-3 py-1.5 text-sm">
+              ${hourOptions(day?.close ?? 17)}
+            </select>
+          </div>`;
+          }).join('')}
+        </div>
+        <button type="submit" class="mt-5 bg-sky-400 hover:bg-sky-300 text-black text-sm font-bold px-5 py-2.5 rounded-lg transition-colors">
+          Save Hours
+        </button>
+        ${req.query.saved ? '<span class="ml-3 text-sm text-green-400">Saved ✓</span>' : ''}
+      </form>
+    </div>
+
     <!-- Call logs -->
     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
       <div class="px-6 py-4 border-b border-zinc-800">
@@ -211,6 +246,23 @@ ${call.transcript}
 
 </body>
 </html>`);
+});
+
+// Save business hours
+portalRouter.post('/hours', requireClient, async (req, res) => {
+  const [client] = await sql`SELECT id FROM clients WHERE portal_token = ${req.portalToken} AND status IN ('active', 'past_due')`;
+  if (!client) return res.redirect('/portal/login');
+
+  const businessHours = {};
+  for (let i = 0; i <= 6; i++) {
+    const isOpen = req.body[`open_${i}`] !== undefined;
+    businessHours[String(i)] = isOpen
+      ? { open: parseInt(req.body[`start_${i}`], 10), close: parseInt(req.body[`end_${i}`], 10) }
+      : null;
+  }
+
+  await sql`UPDATE clients SET business_hours = ${sql.json(businessHours)} WHERE id = ${client.id}`;
+  res.redirect(`/portal?token=${req.portalToken}&saved=1`);
 });
 
 // Stripe billing portal redirect

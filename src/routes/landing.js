@@ -143,9 +143,9 @@ landingRouter.get('/', (_req, res) => {
       </div>
       <h2 class="text-3xl font-extrabold mb-4">We're onboarding our first Victoria contractors</h2>
       <p class="text-gray-400 mb-8 text-lg">
-        Founding customers get <span class="accent font-semibold">[FOUNDING PRICE]/month</span> locked in for 12 months in exchange for honest feedback.
+        Founding customers get <span class="accent font-semibold">$199 CAD/month</span> locked in for 12 months in exchange for honest feedback.
       </p>
-      <a href="/onboard"
+      <a href="/onboard?plan=founders"
         class="inline-block accent-bg hover:bg-sky-400 text-black font-bold px-8 py-4 rounded-xl text-lg transition-colors">
         Become a Founding Customer
       </a>
