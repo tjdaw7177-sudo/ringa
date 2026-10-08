@@ -33,17 +33,19 @@ portalRouter.get('/login', (req, res) => {
     <h1 class="text-2xl font-extrabold text-white mb-1">
       <span class="text-white">Ring</span><span class="text-sky-400">a</span> Portal
     </h1>
-    <p class="text-zinc-500 text-sm mb-6">Sign in with your business email</p>
-    ${error ? `<p class="text-red-400 text-sm mb-4 bg-red-900/20 border border-red-800 rounded-lg px-3 py-2">No account found with that email.</p>` : ''}
+    <p class="text-zinc-500 text-sm mb-6">Sign in with the email and phone number you signed up with</p>
+    ${error ? `<p class="text-red-400 text-sm mb-4 bg-red-900/20 border border-red-800 rounded-lg px-3 py-2">No account found with that email and phone number.</p>` : ''}
     <form method="POST" action="/portal/login" class="space-y-4">
       <input name="email" type="email" required placeholder="you@example.com" autofocus
+        class="w-full bg-zinc-800 border border-zinc-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-sky-500 placeholder-zinc-500">
+      <input name="phone" type="tel" required placeholder="+17785551234"
         class="w-full bg-zinc-800 border border-zinc-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-sky-500 placeholder-zinc-500">
       <button type="submit"
         class="w-full bg-sky-400 hover:bg-sky-300 text-black font-bold py-3 rounded-lg transition-colors">
         Sign In
       </button>
     </form>
-    <p class="text-zinc-600 text-xs mt-4 text-center">Use the email you signed up with</p>
+    <p class="text-zinc-600 text-xs mt-4 text-center">Use the email and phone number you signed up with</p>
   </div>
 </body>
 </html>`);
@@ -51,14 +53,24 @@ portalRouter.get('/login', (req, res) => {
 
 // Login submit
 portalRouter.post('/login', async (req, res) => {
-  const { email } = req.body;
-  const [client] = await sql`SELECT portal_token FROM clients WHERE email = ${email} AND status IN ('active', 'past_due')`;
-  if (!client) return res.redirect('/portal/login?error=1');
-  res.redirect(`/portal?token=${client.portal_token}`);
+  try {
+    const { email, phone } = req.body;
+    const normalize = (p) => (p ?? '').replace(/\D/g, '').replace(/^1/, '');
+
+    const [client] = await sql`SELECT portal_token, emergency_number FROM clients WHERE email = ${email} AND status IN ('active', 'past_due')`;
+    if (!client || normalize(client.emergency_number) !== normalize(phone)) {
+      return res.redirect('/portal/login?error=1');
+    }
+    res.redirect(`/portal?token=${client.portal_token}`);
+  } catch (err) {
+    console.error('[portal] login failed:', err.message);
+    res.redirect('/portal/login?error=1');
+  }
 });
 
 // Portal dashboard
 portalRouter.get('/', requireClient, async (req, res) => {
+  try {
   const [client] = await sql`SELECT * FROM clients WHERE portal_token = ${req.portalToken} AND status IN ('active', 'past_due')`;
   if (!client) return res.redirect('/portal/login');
 
@@ -246,23 +258,32 @@ ${call.transcript}
 
 </body>
 </html>`);
+  } catch (err) {
+    console.error('[portal] dashboard failed:', err.message);
+    res.status(500).send('Something went wrong loading your portal. Please try again.');
+  }
 });
 
 // Save business hours
 portalRouter.post('/hours', requireClient, async (req, res) => {
-  const [client] = await sql`SELECT id FROM clients WHERE portal_token = ${req.portalToken} AND status IN ('active', 'past_due')`;
-  if (!client) return res.redirect('/portal/login');
+  try {
+    const [client] = await sql`SELECT id FROM clients WHERE portal_token = ${req.portalToken} AND status IN ('active', 'past_due')`;
+    if (!client) return res.redirect('/portal/login');
 
-  const businessHours = {};
-  for (let i = 0; i <= 6; i++) {
-    const isOpen = req.body[`open_${i}`] !== undefined;
-    businessHours[String(i)] = isOpen
-      ? { open: parseInt(req.body[`start_${i}`], 10), close: parseInt(req.body[`end_${i}`], 10) }
-      : null;
+    const businessHours = {};
+    for (let i = 0; i <= 6; i++) {
+      const isOpen = req.body[`open_${i}`] !== undefined;
+      businessHours[String(i)] = isOpen
+        ? { open: parseInt(req.body[`start_${i}`], 10), close: parseInt(req.body[`end_${i}`], 10) }
+        : null;
+    }
+
+    await sql`UPDATE clients SET business_hours = ${sql.json(businessHours)} WHERE id = ${client.id}`;
+    res.redirect(`/portal?token=${req.portalToken}&saved=1`);
+  } catch (err) {
+    console.error('[portal] save hours failed:', err.message);
+    res.redirect(`/portal?token=${req.portalToken}`);
   }
-
-  await sql`UPDATE clients SET business_hours = ${sql.json(businessHours)} WHERE id = ${client.id}`;
-  res.redirect(`/portal?token=${req.portalToken}&saved=1`);
 });
 
 // Stripe billing portal redirect

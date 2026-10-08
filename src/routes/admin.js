@@ -34,6 +34,7 @@ function requireOwner(req, res, next) {
 }
 
 adminRouter.get('/', requireOwner, async (req, res) => {
+ try {
   const clients = await sql`
     SELECT c.*, pn.twilio_phone_number
     FROM clients c
@@ -180,20 +181,34 @@ adminRouter.get('/', requireOwner, async (req, res) => {
 
 </body>
 </html>`);
+ } catch (err) {
+   console.error('[admin] dashboard failed:', err.message);
+   res.status(500).send('Something went wrong loading the admin dashboard.');
+ }
 });
 
 adminRouter.post('/deactivate', requireOwner, async (req, res) => {
-  const { clientId } = req.body;
-  await sql`UPDATE clients SET status = 'cancelled' WHERE id = ${clientId}`;
-  console.log('[admin] deactivated client:', clientId);
-  res.redirect(`/admin?secret=${req.query.secret}`);
+  try {
+    const { clientId } = req.body;
+    await sql`UPDATE clients SET status = 'cancelled' WHERE id = ${clientId}`;
+    console.log('[admin] deactivated client:', clientId);
+    res.redirect(`/admin?secret=${req.query.secret}`);
+  } catch (err) {
+    console.error('[admin] deactivate failed:', err.message);
+    res.status(500).send('Failed to deactivate client.');
+  }
 });
 
 adminRouter.post('/activate', requireOwner, async (req, res) => {
-  const { clientId } = req.body;
-  await sql`UPDATE clients SET status = 'active' WHERE id = ${clientId}`;
-  console.log('[admin] activated client:', clientId);
-  res.redirect(`/admin?secret=${req.query.secret}`);
+  try {
+    const { clientId } = req.body;
+    await sql`UPDATE clients SET status = 'active' WHERE id = ${clientId}`;
+    console.log('[admin] activated client:', clientId);
+    res.redirect(`/admin?secret=${req.query.secret}`);
+  } catch (err) {
+    console.error('[admin] activate failed:', err.message);
+    res.status(500).send('Failed to activate client.');
+  }
 });
 
 const DEFAULT_HOURS = {

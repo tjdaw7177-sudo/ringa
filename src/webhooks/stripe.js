@@ -18,26 +18,32 @@ stripeWebhookRouter.post('/', async (req, res) => {
 
   console.log('[stripe] event:', event.type);
 
-  if (event.type === 'customer.subscription.deleted') {
-    const subscriptionId = event.data.object.id;
-    await sql`
-      UPDATE clients SET status = 'cancelled'
-      WHERE stripe_subscription_id = ${subscriptionId}
-    `;
-    console.log('[stripe] cancelled subscription:', subscriptionId);
-  }
+  try {
+    if (event.type === 'customer.subscription.deleted') {
+      const subscriptionId = event.data.object.id;
+      await sql`
+        UPDATE clients SET status = 'cancelled'
+        WHERE stripe_subscription_id = ${subscriptionId}
+      `;
+      console.log('[stripe] cancelled subscription:', subscriptionId);
+    }
 
-  if (event.type === 'invoice.payment_failed') {
-    const customerId = event.data.object.customer;
-    await sql`UPDATE clients SET status = 'past_due' WHERE stripe_customer_id = ${customerId}`;
-    console.warn('[stripe] payment failed, marked past_due for customer:', customerId);
-  }
+    if (event.type === 'invoice.payment_failed') {
+      const customerId = event.data.object.customer;
+      await sql`UPDATE clients SET status = 'past_due' WHERE stripe_customer_id = ${customerId}`;
+      console.warn('[stripe] payment failed, marked past_due for customer:', customerId);
+    }
 
-  if (event.type === 'invoice.paid') {
-    const customerId = event.data.object.customer;
-    await sql`UPDATE clients SET status = 'active' WHERE stripe_customer_id = ${customerId} AND status = 'past_due'`;
-    console.log('[stripe] payment recovered, reactivated customer:', customerId);
-  }
+    if (event.type === 'invoice.paid') {
+      const customerId = event.data.object.customer;
+      await sql`UPDATE clients SET status = 'active' WHERE stripe_customer_id = ${customerId} AND status = 'past_due'`;
+      console.log('[stripe] payment recovered, reactivated customer:', customerId);
+    }
 
-  res.json({ received: true });
+    res.json({ received: true });
+  } catch (err) {
+    console.error('[stripe] event processing failed:', err.message);
+    // 500 so Stripe retries (handles transient DB issues) instead of silently dropping the event
+    res.status(500).json({ received: false });
+  }
 });

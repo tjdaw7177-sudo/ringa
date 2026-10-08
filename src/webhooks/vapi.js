@@ -8,6 +8,7 @@ import sql from '../db/index.js';
 export const vapiWebhookRouter = Router();
 
 vapiWebhookRouter.post('/', async (req, res) => {
+ try {
   const { message } = req.body;
 
   console.log('[vapi] message type:', message?.type);
@@ -76,4 +77,8 @@ vapiWebhookRouter.post('/', async (req, res) => {
   }
 
   res.sendStatus(200);
+ } catch (err) {
+   console.error('[vapi] webhook failed:', err.message);
+   res.sendStatus(200);
+ }
 });
