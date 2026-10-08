@@ -216,13 +216,13 @@ landingRouter.get('/', (_req, res) => {
         <h3 class="text-lg font-bold text-white mb-6 text-center">What are missed calls costing you?</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           <div>
-            <label class="block text-sm text-gray-400 mb-2" for="roi-missed-calls">Missed calls per month</label>
-            <input id="roi-missed-calls" type="number" min="0" step="1" value="3" oninput="ringaCalcROI()"
+            <label class="block text-sm text-gray-400 mb-2" for="roi-missed-calls">Missed calls per week</label>
+            <input id="roi-missed-calls" type="number" min="0" step="1" value="5" oninput="ringaCalcROI()"
               class="w-full bg-zinc-800 border border-zinc-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-sky-500">
           </div>
           <div>
             <label class="block text-sm text-gray-400 mb-2" for="roi-job-value">Average job value ($)</label>
-            <input id="roi-job-value" type="number" min="0" step="1" value="100" oninput="ringaCalcROI()"
+            <input id="roi-job-value" type="number" min="0" step="1" value="400" oninput="ringaCalcROI()"
               class="w-full bg-zinc-800 border border-zinc-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-sky-500">
           </div>
         </div>
@@ -473,14 +473,18 @@ landingRouter.get('/', (_req, res) => {
     function ringaCalcROI() {
       const calls = parseFloat(document.getElementById('roi-missed-calls').value) || 0;
       const jobValue = parseFloat(document.getElementById('roi-job-value').value) || 0;
-      const lost = calls * jobValue * 0.5;
+      const lost = calls * 4.3 * jobValue * 0.5;
       const rounded = Math.round(lost);
       document.getElementById('roi-result').textContent = '$' + rounded.toLocaleString();
       const compareEl = document.getElementById('roi-compare');
       if (calls > 0 && jobValue > 0) {
-        compareEl.textContent = rounded > 399
-          ? "That's more than Ringa's Starter plan at $399 CAD/month."
-          : "Compare that to Ringa's Starter plan at $399 CAD/month.";
+        if (rounded > 399) {
+          compareEl.textContent = "That's more than both Ringa's $199 CAD/month Founding offer and the regular $399 CAD/month Starter plan.";
+        } else if (rounded > 199) {
+          compareEl.textContent = "That's more than Ringa's $199 CAD/month Founding offer — still less than the regular $399 CAD/month Starter plan.";
+        } else {
+          compareEl.textContent = "Compare that to Ringa's Founding offer at $199 CAD/month (or $399 CAD/month on Starter).";
+        }
       } else {
         compareEl.textContent = '';
       }
