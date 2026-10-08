@@ -291,7 +291,7 @@ landingRouter.get('/', (_req, res) => {
 
       </div>
 
-      <p class="text-center text-sm text-gray-500 mt-8">All plans include [UNLIMITED MINUTES OR LIMIT] call minutes.</p>
+      <p class="text-center text-sm text-gray-500 mt-8">All plans include unlimited call minutes.</p>
 
       <!-- What's included detail -->
       <div class="mt-16 metallic-card rounded-2xl p-8 border border-zinc-800">
