@@ -214,13 +214,13 @@ landingRouter.get('/', (_req, res) => {
         <h3 class="text-lg font-bold text-white mb-6 text-center">What are missed calls costing you?</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           <div>
-            <label class="block text-sm text-gray-400 mb-2" for="roi-missed-calls">Missed calls per week</label>
-            <input id="roi-missed-calls" type="number" min="0" step="1" placeholder="e.g. 5" oninput="ringaCalcROI()"
+            <label class="block text-sm text-gray-400 mb-2" for="roi-missed-calls">Missed calls per month</label>
+            <input id="roi-missed-calls" type="number" min="0" step="1" value="3" oninput="ringaCalcROI()"
               class="w-full bg-zinc-800 border border-zinc-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-sky-500">
           </div>
           <div>
             <label class="block text-sm text-gray-400 mb-2" for="roi-job-value">Average job value ($)</label>
-            <input id="roi-job-value" type="number" min="0" step="1" placeholder="e.g. 300" oninput="ringaCalcROI()"
+            <input id="roi-job-value" type="number" min="0" step="1" value="100" oninput="ringaCalcROI()"
               class="w-full bg-zinc-800 border border-zinc-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-sky-500">
           </div>
         </div>
@@ -244,7 +244,7 @@ landingRouter.get('/', (_req, res) => {
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
-        <div class="rounded-2xl p-8 relative border-2 border-sky-500" style="background: linear-gradient(145deg, #0c1f2e, #0a1520);">
+        <div class="metallic-card rounded-2xl p-8 relative">
           <div class="absolute -top-3 left-1/2 -translate-x-1/2 accent-bg text-black text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">Founding Offer</div>
           <h3 class="text-xl font-bold text-white">Founding Customer</h3>
           <p class="text-sm text-gray-500 mt-1">Limited to 10 spots. Locked in for 12 months.</p>
@@ -278,7 +278,7 @@ landingRouter.get('/', (_req, res) => {
           </a>
         </div>
 
-        <div class="rounded-2xl p-8 relative border-2 border-sky-500" style="background: linear-gradient(145deg, #0c1f2e, #0a1520);">
+        <div class="metallic-card rounded-2xl p-8 relative">
           <h3 class="text-xl font-bold text-white">Professional</h3>
           <p class="text-sm text-gray-500 mt-1">Growing shops with multiple lines or trucks, up to 3 numbers.</p>
           <p class="text-4xl font-extrabold text-white mt-4">$599 CAD<span class="text-base font-normal text-gray-500">/mo</span></p>
@@ -471,7 +471,7 @@ landingRouter.get('/', (_req, res) => {
     function ringaCalcROI() {
       const calls = parseFloat(document.getElementById('roi-missed-calls').value) || 0;
       const jobValue = parseFloat(document.getElementById('roi-job-value').value) || 0;
-      const lost = calls * 4.3 * jobValue * 0.5;
+      const lost = calls * jobValue * 0.5;
       const rounded = Math.round(lost);
       document.getElementById('roi-result').textContent = '$' + rounded.toLocaleString();
       const compareEl = document.getElementById('roi-compare');
@@ -483,6 +483,7 @@ landingRouter.get('/', (_req, res) => {
         compareEl.textContent = '';
       }
     }
+    ringaCalcROI();
   </script>
 
 </body>
