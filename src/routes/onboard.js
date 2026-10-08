@@ -48,6 +48,7 @@ onboardRouter.get('/', async (req, res) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ringa — Founding Spots Full</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
@@ -69,6 +70,7 @@ onboardRouter.get('/', async (req, res) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ringa — Get Started</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
@@ -330,6 +332,7 @@ onboardRouter.get('/owner', (req, res) => {
 <head>
   <meta charset="UTF-8">
   <title>Ringa — Owner Setup</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
@@ -592,6 +595,7 @@ Tone: friendly, calm, efficient. Keep responses short — this is a phone call, 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ringa — You're Live!</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/styles.css">
   <script>
   !function(f,b,e,v,n,t,s)
