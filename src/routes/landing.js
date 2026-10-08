@@ -237,12 +237,29 @@ landingRouter.get('/', (_req, res) => {
 
   <!-- Pricing -->
   <section id="pricing" class="py-24 px-6">
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-6xl mx-auto">
       <div class="text-center mb-16">
         <h2 class="text-4xl font-extrabold">Simple, transparent pricing</h2>
         <p class="text-gray-500 mt-3 text-lg">7-day free trial on all plans. No setup fees. Cancel any time.</p>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+        <div class="rounded-2xl p-8 relative border-2 border-sky-500" style="background: linear-gradient(145deg, #0c1f2e, #0a1520);">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 accent-bg text-black text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">Founding Offer</div>
+          <h3 class="text-xl font-bold text-white">Founding Customer</h3>
+          <p class="text-sm text-gray-500 mt-1">Limited to 10 spots. Locked in for 12 months.</p>
+          <p class="text-4xl font-extrabold text-white mt-4">$199 CAD<span class="text-base font-normal text-gray-500">/mo</span></p>
+          <ul class="mt-6 space-y-3 text-sm text-gray-400">
+            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 1 AI receptionist</li>
+            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 1 dedicated phone number</li>
+            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Appointment booking</li>
+            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Emergency dispatch</li>
+            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> SMS confirmations & reminders</li>
+          </ul>
+          <a href="/onboard?plan=founders" class="mt-8 block text-center accent-bg hover:bg-sky-400 text-black font-bold py-3 rounded-xl transition-colors">
+            Become a Founding Customer
+          </a>
+        </div>
 
         <div class="metallic-card rounded-2xl p-8 relative">
           <div class="absolute -top-3 left-1/2 -translate-x-1/2 accent-bg text-black text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">Best for owner-operators</div>
