@@ -342,7 +342,7 @@ landingRouter.get('/', (_req, res) => {
             <div class="text-2xl flex-shrink-0">🕐</div>
             <div>
               <p class="font-bold text-white mb-1">Respects your business hours</p>
-              <p class="text-gray-500 text-sm">By default, Ringa books Mon–Fri 8am–5pm and Sat 8am–12pm. Try to book outside those hours? It'll let the customer know when you're available next. You can change your hours [HOW: in your portal / by contacting us].</p>
+              <p class="text-gray-500 text-sm">By default, Ringa books Mon–Fri 8am–5pm and Sat 8am–12pm. Try to book outside those hours? It'll let the customer know when you're available next. You can change your hours anytime from your portal.</p>
             </div>
           </div>
 
@@ -379,7 +379,7 @@ landingRouter.get('/', (_req, res) => {
 
         ${[
           ['Do I need any technical knowledge to set up Ringa?', 'No. You fill out a short form, connect your Google Calendar with one click, and you\'re done. The whole thing takes under 2 minutes. We handle everything else.'],
-          ['How does the AI know when I\'m available?', 'By default, Ringa books Mon–Fri 8am–5pm and Sat 8am–12pm. You can change your hours [HOW: in your portal / by contacting us]. If someone calls outside those hours, Ringa lets them know when you\'re next available.'],
+          ['How does the AI know when I\'m available?', 'By default, Ringa books Mon–Fri 8am–5pm and Sat 8am–12pm. You can change your hours anytime from your portal. If someone calls outside those hours, Ringa lets them know when you\'re next available.'],
           ['What happens if someone calls with an emergency?', 'Ringa immediately texts your designated on-call number with the customer\'s name, address and issue.'],
           ['Do my customers know they\'re talking to an AI?', 'Ringa sounds natural and professional. Most customers don\'t ask, but if they do, Ringa is honest. The goal is to make the experience as smooth as a real receptionist.'],
           ['What if I already have a business phone number?', 'You keep your existing number. Simply forward your calls to your Ringa number and Ringa handles everything from there. You can turn forwarding on or off any time.'],
