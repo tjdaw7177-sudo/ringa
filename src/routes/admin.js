@@ -225,9 +225,9 @@ const DEFAULT_HOURS = {
 // wiring as /onboard, minus the Stripe subscription, since this isn't a
 // paying customer. Reuses an existing Twilio number rather than buying one.
 adminRouter.post('/create-demo', requireOwner, async (req, res) => {
-  const { businessName, twilioNumber, emergencyNumber, calendarId, refreshToken } = req.body;
-  if (!businessName || !twilioNumber || !emergencyNumber || !calendarId || !refreshToken) {
-    return res.status(400).json({ error: 'businessName, twilioNumber, emergencyNumber, calendarId, and refreshToken are all required' });
+  const { businessName, twilioNumber, emergencyNumber, calendarId, refreshToken, email } = req.body;
+  if (!businessName || !twilioNumber || !emergencyNumber || !calendarId || !refreshToken || !email) {
+    return res.status(400).json({ error: 'businessName, twilioNumber, emergencyNumber, calendarId, refreshToken, and email are all required' });
   }
 
   try {
@@ -335,9 +335,10 @@ Tone: friendly, calm, efficient. Keep responses short — this is a phone call, 
     });
 
     const clientId = uuidv4();
+    const portalToken = uuidv4();
     await sql`
-      INSERT INTO clients (id, business_name, timezone, emergency_number, business_hours, google_calendar_id, google_refresh_token, status)
-      VALUES (${clientId}, ${businessName}, 'America/Vancouver', ${emergencyNumber}, ${JSON.stringify(DEFAULT_HOURS)}, ${calendarId}, ${refreshToken}, 'active')
+      INSERT INTO clients (id, business_name, timezone, emergency_number, business_hours, google_calendar_id, google_refresh_token, email, portal_token, status)
+      VALUES (${clientId}, ${businessName}, 'America/Vancouver', ${emergencyNumber}, ${JSON.stringify(DEFAULT_HOURS)}, ${calendarId}, ${refreshToken}, ${email}, ${portalToken}, 'active')
     `;
     await sql`
       INSERT INTO phone_numbers (id, client_id, twilio_phone_number, vapi_phone_number_id, vapi_assistant_id, label)
@@ -345,9 +346,23 @@ Tone: friendly, calm, efficient. Keep responses short — this is a phone call, 
     `;
     console.log('[admin] demo client created:', clientId);
 
-    res.json({ success: true, clientId, twilioNumber, vapiAssistantId: vapiAssistant.id });
+    res.json({ success: true, clientId, twilioNumber, vapiAssistantId: vapiAssistant.id, portalLogin: { email, loginUrl: `${process.env.APP_URL}/portal/login` } });
   } catch (err) {
     console.error('[admin] create-demo failed:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// One-off repair for the demo client created before email/portal_token were set
+adminRouter.post('/fix-client-login', requireOwner, async (req, res) => {
+  const { clientId, email } = req.body;
+  if (!clientId || !email) return res.status(400).json({ error: 'clientId and email required' });
+  try {
+    const portalToken = uuidv4();
+    await sql`UPDATE clients SET email = ${email}, portal_token = ${portalToken} WHERE id = ${clientId}`;
+    res.json({ success: true, email, portalToken });
+  } catch (err) {
+    console.error('[admin] fix-client-login failed:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
