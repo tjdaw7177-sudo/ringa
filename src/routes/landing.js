@@ -386,7 +386,7 @@ landingRouter.get('/', (_req, res) => {
           ['Can I cancel any time?', 'Yes. Cancel any time from your Stripe billing portal. No cancellation fees, no contracts. Your number stays active until the end of your billing period.'],
           ['What happens during my 7-day free trial?', 'You get full access to everything — your AI receptionist is live, calls are answered, appointments are booked. Your card is on file but you won\'t be charged until day 8.'],
           ['Can I use Ringa for multiple locations?', 'Yes. The Professional plan supports up to 3 locations or numbers, and the Enterprise plan supports 5+. Each location gets its own dedicated phone number and AI receptionist.'],
-          ['Does Ringa work with Jobber, Housecall Pro or ServiceTitan?', 'Ringa currently books into Google Calendar. [INTEGRATION STATUS, e.g. Jobber and Housecall Pro integrations are on our roadmap — let us know which you use.]'],
+          ['Does Ringa work with Jobber, Housecall Pro or ServiceTitan?', 'Not yet — Ringa currently books into Google Calendar. If you use Jobber, Housecall Pro, or ServiceTitan, let us know when you sign up and we\'ll factor it into what we build next.'],
           ['Are calls recorded?', 'Yes. Calls are recorded and transcribed so you can review them in your portal. Callers hear a brief notice at the start of each call that the call may be recorded.'],
         ].map(([q, a]) => `
         <details class="metallic-card rounded-xl group">

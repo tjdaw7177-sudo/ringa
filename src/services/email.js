@@ -2,7 +2,7 @@ import { Resend } from 'resend';
 
 export async function sendNewClientAlert({ businessName, email, ringaNumber, tier }) {
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const TIER_PRICES = { starter: '$399', professional: '$599', enterprise: '$799' };
+  const TIER_PRICES = { starter: '$399', professional: '$599', enterprise: '$799', founders: '$199' };
   await resend.emails.send({
     from: process.env.RESEND_FROM,
     to: 'getringa@gmail.com',

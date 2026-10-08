@@ -5,7 +5,7 @@ import Stripe from 'stripe';
 import sql from '../db/index.js';
 import { TIER_LIMITS } from '../services/clientLoader.js';
 
-const TIER_NAMES = { starter: 'Starter', professional: 'Professional', enterprise: 'Enterprise' };
+const TIER_NAMES = { starter: 'Starter', professional: 'Professional', enterprise: 'Enterprise', founders: 'Founding Customer' };
 
 export const portalRouter = Router();
 

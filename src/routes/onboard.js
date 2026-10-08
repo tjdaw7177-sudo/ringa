@@ -12,8 +12,11 @@ export const onboardRouter = Router();
 function tierFromPriceId(priceId) {
   if (priceId === process.env.STRIPE_PRICE_ID_TIER2) return 'professional';
   if (priceId === process.env.STRIPE_PRICE_ID_TIER3) return 'enterprise';
+  if (priceId === process.env.FOUNDERS_STRIPE) return 'founders';
   return 'starter';
 }
+
+const FOUNDERS_LIMIT = 10;
 
 const DEFAULT_HOURS = {
   "0": null,
@@ -26,8 +29,40 @@ const DEFAULT_HOURS = {
 };
 
 // Step 1 — show onboarding form
-onboardRouter.get('/', (req, res) => {
+onboardRouter.get('/', async (req, res) => {
   const isFounders = req.query.plan === 'founders';
+  let foundersFull = false;
+  if (isFounders) {
+    try {
+      const [{ count }] = await sql`SELECT COUNT(*) FROM clients WHERE tier = 'founders'`;
+      foundersFull = parseInt(count, 10) >= FOUNDERS_LIMIT;
+    } catch (err) {
+      console.error('[onboard] founders count check failed:', err.message);
+    }
+  }
+
+  if (foundersFull) {
+    return res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ringa — Founding Spots Full</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md text-center">
+    <h1 class="text-2xl font-bold text-gray-900 mb-3">Founding Spots Are Full</h1>
+    <p class="text-gray-500 mb-6">All ${FOUNDERS_LIMIT} founding customer spots have been claimed. You can still sign up on our regular pricing.</p>
+    <a href="/onboard"
+      class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl transition-colors">
+      View Regular Pricing
+    </a>
+  </div>
+</body>
+</html>`);
+  }
+
   res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -198,6 +233,13 @@ onboardRouter.post('/submit', async (req, res) => {
     ];
     if (!validPriceIds.includes(priceId)) {
       return res.status(400).send('Invalid plan selected.');
+    }
+
+    if (priceId === process.env.FOUNDERS_STRIPE) {
+      const [{ count }] = await sql`SELECT COUNT(*) FROM clients WHERE tier = 'founders'`;
+      if (parseInt(count, 10) >= FOUNDERS_LIMIT) {
+        return res.status(400).send(`Founding spots are full. <a href="/onboard">View regular pricing →</a>`);
+      }
     }
 
     const [existing] = await sql`SELECT id FROM clients WHERE email = ${email}`;
@@ -531,7 +573,7 @@ Tone: friendly, calm, efficient. Keep responses short — this is a phone call, 
     }
 
     const tier = client.tier ?? 'starter';
-    const TIER_PRICES = { starter: 399, professional: 599, enterprise: 799 };
+    const TIER_PRICES = { starter: 399, professional: 599, enterprise: 799, founders: 199 };
     const leadValue = TIER_PRICES[tier] ?? 399;
 
     // Notify owner of new signup

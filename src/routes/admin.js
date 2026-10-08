@@ -56,7 +56,7 @@ adminRouter.get('/', requireOwner, async (req, res) => {
   };
 
   const activeClients = clients.filter(c => c.status === 'active');
-  const TIER_PRICES = { starter: 399, professional: 599, enterprise: 799 };
+  const TIER_PRICES = { starter: 399, professional: 599, enterprise: 799, founders: 199 };
   const mrr = activeClients.reduce((sum, c) => {
     return sum + (TIER_PRICES[c.tier ?? 'starter'] ?? 399);
   }, 0);

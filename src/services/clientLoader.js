@@ -1,6 +1,6 @@
 import sql from '../db/index.js';
 
-export const TIER_LIMITS = { starter: 1, professional: 3, enterprise: 5 };
+export const TIER_LIMITS = { starter: 1, professional: 3, enterprise: 5, founders: 1 };
 
 function rowToClient(row) {
   return {
