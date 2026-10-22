@@ -32,6 +32,12 @@ app.use('/portal', portalRouter);
 app.use('/', legalRouter);
 app.use('/', landingRouter);
 
+// Last-resort net: a stray rejection anywhere would otherwise kill the process,
+// taking the whole site down until Render restarts it. Log it and stay up.
+process.on('unhandledRejection', (reason) => {
+  console.error('[fatal] unhandled rejection:', reason instanceof Error ? reason.stack : reason);
+});
+
 const port = process.env.PORT ?? 3000;
 app.listen(port, () => {
   console.log(`Ringa listening on :${port}`);

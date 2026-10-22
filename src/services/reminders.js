@@ -26,23 +26,27 @@ function sendReminder(client, event) {
 
 export function startReminderCron() {
   cron.schedule('0 * * * *', async () => {
-    const now = new Date();
-    const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-    const in25h = new Date(now.getTime() + 25 * 60 * 60 * 1000);
+    try {
+      const now = new Date();
+      const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+      const in25h = new Date(now.getTime() + 25 * 60 * 60 * 1000);
 
-    const seenIds = new Set();
-    for (const client of await getAllClients()) {
-      if (seenIds.has(client.id)) continue;
-      seenIds.add(client.id);
-      try {
-        const events = await getAppointmentsStartingBetween(in24h, in25h, client);
-        for (const event of events) {
-          await sendReminder(client, event);
-          console.log(`[reminders] sent reminder for event: ${event.summary}`);
+      const seenIds = new Set();
+      for (const client of await getAllClients()) {
+        if (seenIds.has(client.id)) continue;
+        seenIds.add(client.id);
+        try {
+          const events = await getAppointmentsStartingBetween(in24h, in25h, client);
+          for (const event of events) {
+            await sendReminder(client, event);
+            console.log(`[reminders] sent reminder for event: ${event.summary}`);
+          }
+        } catch (err) {
+          console.error(`[reminders] error for client ${client.id}:`, err.message);
         }
-      } catch (err) {
-        console.error(`[reminders] error for client ${client.id}:`, err.message);
       }
+    } catch (err) {
+      console.error('[reminders] cron run failed:', err.message);
     }
   });
 
