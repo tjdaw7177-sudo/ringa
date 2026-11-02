@@ -355,6 +355,20 @@ Tone: friendly, calm, efficient. Keep responses short — this is a phone call, 
   }
 });
 
+// Reconnect a client's Google Calendar (fresh refresh token after invalid_grant,
+// revoked access, etc.) without needing a full re-signup
+adminRouter.post('/update-calendar-token', requireOwner, async (req, res) => {
+  const { clientId, refreshToken } = req.body;
+  if (!clientId || !refreshToken) return res.status(400).json({ error: 'clientId and refreshToken required' });
+  try {
+    await sql`UPDATE clients SET google_refresh_token = ${refreshToken} WHERE id = ${clientId}`;
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[admin] update-calendar-token failed:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // One-off repair for the demo client created before email/portal_token were set
 adminRouter.post('/fix-client-login', requireOwner, async (req, res) => {
   const { clientId, email } = req.body;
