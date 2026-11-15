@@ -428,7 +428,7 @@ landingRouter.get('/', (_req, res) => {
         <p class="text-gray-500 mt-3 text-lg">Talk to a real person before you sign up — no pressure, no sales pitch.</p>
         <p class="text-gray-400 mt-4">Locally owned and operated in Victoria. Talk to a real person, not a call centre.</p>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
 
         <div class="metallic-card rounded-2xl p-8 flex gap-5 items-start">
           <div class="text-3xl flex-shrink-0">📧</div>
@@ -445,6 +445,15 @@ landingRouter.get('/', (_req, res) => {
             <p class="font-bold text-white text-lg mb-1">Call or text us</p>
             <p class="text-gray-500 text-sm mb-3">Speak directly with someone from the Ringa team — call or text anytime.</p>
             <a href="tel:+12368822840" class="accent font-semibold hover:underline">+1 (236) 882-2840</a>
+          </div>
+        </div>
+
+        <div class="metallic-card rounded-2xl p-8 flex gap-5 items-start">
+          <div class="text-3xl flex-shrink-0">📍</div>
+          <div>
+            <p class="font-bold text-white text-lg mb-1">Find us</p>
+            <p class="text-gray-500 text-sm mb-3">Based right here in Victoria, BC.</p>
+            <p class="accent font-semibold">1671 Littlewood Pl<br>Victoria, BC V8L 6A3</p>
           </div>
         </div>
 
