@@ -1,6 +1,8 @@
 import sql from '../db/index.js';
 
 export const TIER_LIMITS = { starter: 1, professional: 3, enterprise: 5, founders: 1 };
+export const TIER_MINUTES = { founders: 150, starter: 250, professional: 350, enterprise: 500 };
+export const OVERAGE_CENTS_PER_MINUTE = 50;
 
 function rowToClient(row) {
   return {

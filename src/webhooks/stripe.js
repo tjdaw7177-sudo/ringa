@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import Stripe from 'stripe';
 import sql from '../db/index.js';
+import { chargeOverageIfNeeded } from '../services/billing.js';
 
 export const stripeWebhookRouter = Router();
 
@@ -35,9 +36,17 @@ stripeWebhookRouter.post('/', async (req, res) => {
     }
 
     if (event.type === 'invoice.paid') {
-      const customerId = event.data.object.customer;
+      const invoice = event.data.object;
+      const customerId = invoice.customer;
       await sql`UPDATE clients SET status = 'active' WHERE stripe_customer_id = ${customerId} AND status = 'past_due'`;
       console.log('[stripe] payment recovered, reactivated customer:', customerId);
+
+      // billing_reason is 'subscription_cycle' on a renewal (meaning a full
+      // period just completed) vs 'subscription_create' on the very first
+      // invoice, which has no prior usage to bill overage for.
+      if (invoice.billing_reason === 'subscription_cycle') {
+        await chargeOverageIfNeeded(stripe, customerId);
+      }
     }
 
     res.json({ received: true });

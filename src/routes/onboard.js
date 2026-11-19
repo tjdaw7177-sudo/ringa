@@ -94,8 +94,7 @@ onboardRouter.get('/', async (req, res) => {
           </div>
           <p class="text-2xl font-extrabold text-blue-600 mt-1">$199 CAD<span class="text-sm font-normal text-gray-400">/mo</span></p>
           <ul class="mt-3 space-y-1 text-sm text-gray-600">
-            <li>✓ 1 AI receptionist</li>
-            <li>✓ 1 phone number</li>
+            <li>✓ 150 call minutes/month</li>
             <li>✓ Appointment booking</li>
             <li>✓ Emergency dispatch</li>
             <li>✓ SMS reminders</li>
@@ -110,8 +109,7 @@ onboardRouter.get('/', async (req, res) => {
               <p class="font-bold text-gray-900 text-lg">Starter</p>
               <p class="text-2xl font-extrabold text-blue-600 mt-1">$399<span class="text-sm font-normal text-gray-400">/mo</span></p>
               <ul class="mt-3 space-y-1 text-sm text-gray-600">
-                <li>✓ 1 AI receptionist</li>
-                <li>✓ 1 phone number</li>
+                <li>✓ 250 call minutes/month</li>
                 <li>✓ Appointment booking</li>
                 <li>✓ Emergency dispatch</li>
                 <li>✓ SMS reminders</li>
@@ -128,9 +126,7 @@ onboardRouter.get('/', async (req, res) => {
               </div>
               <p class="text-2xl font-extrabold text-blue-600 mt-1">$599<span class="text-sm font-normal text-gray-400">/mo</span></p>
               <ul class="mt-3 space-y-1 text-sm text-gray-600">
-                <li>✓ 3 AI receptionists</li>
-                <li>✓ 3 phone numbers</li>
-                <li>✓ Multiple businesses</li>
+                <li>✓ 350 call minutes/month</li>
                 <li>✓ Everything in Starter</li>
               </ul>
             </div>
@@ -142,9 +138,7 @@ onboardRouter.get('/', async (req, res) => {
               <p class="font-bold text-gray-900 text-lg">Enterprise</p>
               <p class="text-2xl font-extrabold text-blue-600 mt-1">$799<span class="text-sm font-normal text-gray-400">/mo</span></p>
               <ul class="mt-3 space-y-1 text-sm text-gray-600">
-                <li>✓ 5+ AI receptionists</li>
-                <li>✓ 5+ phone numbers</li>
-                <li>✓ Multiple locations</li>
+                <li>✓ 500 call minutes/month</li>
                 <li>✓ Everything in Pro</li>
               </ul>
             </div>

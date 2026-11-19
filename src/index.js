@@ -8,6 +8,7 @@ import { adminRouter } from './routes/admin.js';
 import { portalRouter } from './routes/portal.js';
 import { legalRouter } from './routes/legal.js';
 import { startReminderCron } from './services/reminders.js';
+import { createTables } from './db/schema.js';
 
 if (process.env.NODE_ENV !== 'production') {
   const { default: dotenv } = await import('dotenv');
@@ -39,7 +40,12 @@ process.on('unhandledRejection', (reason) => {
 });
 
 const port = process.env.PORT ?? 3000;
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Ringa listening on :${port}`);
+  try {
+    await createTables();
+  } catch (err) {
+    console.error('[db] createTables failed:', err.message);
+  }
   startReminderCron();
 });

@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import twilio from 'twilio';
 import Stripe from 'stripe';
 import sql from '../db/index.js';
-import { TIER_LIMITS } from '../services/clientLoader.js';
+import { TIER_LIMITS, TIER_MINUTES } from '../services/clientLoader.js';
 
 const TIER_NAMES = { starter: 'Starter', professional: 'Professional', enterprise: 'Enterprise', founders: 'Founding Customer' };
 
@@ -84,6 +84,20 @@ portalRouter.get('/', requireClient, async (req, res) => {
     SELECT * FROM call_logs WHERE client_id = ${client.id} ORDER BY created_at DESC LIMIT 50
   `;
 
+  const [lastCharge] = await sql`
+    SELECT period_end FROM usage_charges WHERE client_id = ${client.id} ORDER BY period_end DESC LIMIT 1
+  `;
+  const periodStart = lastCharge
+    ? new Date(lastCharge.period_end)
+    : new Date(new Date().setMonth(new Date().getMonth() - 1));
+  const [{ total_seconds }] = await sql`
+    SELECT COALESCE(SUM(duration_seconds), 0) AS total_seconds
+    FROM call_logs WHERE client_id = ${client.id} AND created_at >= ${periodStart}
+  `;
+  const minutesUsed = Math.ceil(total_seconds / 60);
+  const includedMinutes = TIER_MINUTES[tier] ?? TIER_MINUTES.starter;
+  const overMinutes = Math.max(0, minutesUsed - includedMinutes);
+
   const formatDate = (d) => new Date(d).toLocaleString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
     hour: 'numeric', minute: '2-digit', hour12: true,
@@ -137,11 +151,16 @@ portalRouter.get('/', requireClient, async (req, res) => {
     </div>` : ''}
 
     <!-- Account info -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
         <p class="text-zinc-500 text-sm">Plan</p>
         <p class="text-xl font-bold text-white mt-1">${TIER_NAMES[tier]}</p>
         <p class="text-zinc-600 text-xs mt-1">${phoneNumbers.length} of ${limit} numbers used</p>
+      </div>
+      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
+        <p class="text-zinc-500 text-sm">Minutes This Period</p>
+        <p class="text-xl font-bold ${overMinutes > 0 ? 'text-yellow-400' : 'text-white'} mt-1">${minutesUsed} / ${includedMinutes}</p>
+        <p class="text-zinc-600 text-xs mt-1">${overMinutes > 0 ? `${overMinutes} min over — billed at $0.50/min` : 'Within your plan'}</p>
       </div>
       <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
         <p class="text-zinc-500 text-sm">Total Calls</p>

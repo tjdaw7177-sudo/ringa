@@ -252,8 +252,7 @@ landingRouter.get('/', (_req, res) => {
           <p class="text-sm text-gray-500 mt-1">Limited to 10 spots. Locked in for 12 months.</p>
           <p class="text-4xl font-extrabold text-white mt-4">$199 CAD<span class="text-base font-normal text-gray-500">/mo</span></p>
           <ul class="mt-6 space-y-3 text-sm text-gray-400">
-            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 1 AI receptionist</li>
-            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 1 dedicated phone number</li>
+            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 150 call minutes/month</li>
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Appointment booking</li>
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Emergency dispatch</li>
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> SMS confirmations & reminders</li>
@@ -269,8 +268,7 @@ landingRouter.get('/', (_req, res) => {
           <p class="text-sm text-gray-500 mt-1">Solo operators and small crews.</p>
           <p class="text-4xl font-extrabold text-white mt-4">$399 CAD<span class="text-base font-normal text-gray-500">/mo</span></p>
           <ul class="mt-6 space-y-3 text-sm text-gray-400">
-            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 1 AI receptionist</li>
-            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 1 dedicated phone number</li>
+            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 250 call minutes/month</li>
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Appointment booking</li>
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Emergency dispatch</li>
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> SMS confirmations & reminders</li>
@@ -282,11 +280,10 @@ landingRouter.get('/', (_req, res) => {
 
         <div class="metallic-card rounded-2xl p-8 relative">
           <h3 class="text-xl font-bold text-white">Professional</h3>
-          <p class="text-sm text-gray-500 mt-1">Growing shops with multiple lines or trucks, up to 3 numbers.</p>
+          <p class="text-sm text-gray-500 mt-1">Growing shops that take a higher volume of calls.</p>
           <p class="text-4xl font-extrabold text-white mt-4">$599 CAD<span class="text-base font-normal text-gray-500">/mo</span></p>
           <ul class="mt-6 space-y-3 text-sm text-gray-400">
-            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 3 AI receptionists</li>
-            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Up to 3 locations or numbers</li>
+            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 350 call minutes/month</li>
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Everything in Starter</li>
           </ul>
           <a href="/onboard" class="mt-8 block text-center accent-bg hover:bg-sky-400 text-black font-bold py-3 rounded-xl transition-colors">
@@ -296,11 +293,10 @@ landingRouter.get('/', (_req, res) => {
 
         <div class="metallic-card rounded-2xl p-8">
           <h3 class="text-xl font-bold text-white">Enterprise</h3>
-          <p class="text-sm text-gray-500 mt-1">Multi-location companies, 5+ numbers.</p>
+          <p class="text-sm text-gray-500 mt-1">High-volume shops and multi-location companies.</p>
           <p class="text-4xl font-extrabold text-white mt-4">$799 CAD<span class="text-base font-normal text-gray-500">/mo</span></p>
           <ul class="mt-6 space-y-3 text-sm text-gray-400">
-            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 5+ AI receptionists</li>
-            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 5+ locations or numbers</li>
+            <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> 500 call minutes/month</li>
             <li class="flex items-center gap-2"><span class="accent font-bold">✓</span> Everything in Professional</li>
           </ul>
           <a href="/onboard" class="mt-8 block text-center border border-sky-500 text-sky-400 hover:bg-sky-500 hover:text-black font-semibold py-3 rounded-xl transition-colors">
@@ -310,7 +306,7 @@ landingRouter.get('/', (_req, res) => {
 
       </div>
 
-      <p class="text-center text-sm text-gray-500 mt-8">All plans include unlimited call minutes.</p>
+      <p class="text-center text-sm text-gray-500 mt-8">Need more minutes? Extra usage is billed at $0.50 CAD/min, automatically on your next invoice.</p>
 
       <!-- What's included detail -->
       <div class="mt-16 metallic-card rounded-2xl p-8 border border-zinc-800">
@@ -405,6 +401,7 @@ landingRouter.get('/', (_req, res) => {
           ['Can I cancel any time?', 'Yes. Cancel any time from your Stripe billing portal. No cancellation fees, no contracts. Your number stays active until the end of your billing period.'],
           ['What happens during my 7-day free trial?', 'You get full access to everything — your AI receptionist is live, calls are answered, appointments are booked. Your card is on file but you won\'t be charged until day 8.'],
           ['Can I use Ringa for multiple locations?', 'Yes. The Professional plan supports up to 3 locations or numbers, and the Enterprise plan supports 5+. Each location gets its own dedicated phone number and AI receptionist.'],
+          ['What happens if I go over my included call minutes?', 'You\'re billed $0.50 CAD per additional minute, added automatically to your next invoice. Most businesses stay comfortably within their plan\'s included minutes — overage billing only kicks in if you\'re getting a lot more calls than expected, which is usually a good problem to have.'],
           ['Does Ringa work with Jobber, Housecall Pro or ServiceTitan?', 'Not yet — Ringa currently books into Google Calendar. If you use Jobber, Housecall Pro, or ServiceTitan, let us know when you sign up and we\'ll factor it into what we build next.'],
           ['Are calls recorded?', 'Yes. Calls are recorded and transcribed so you can review them in your portal. Callers hear a brief notice at the start of each call that the call may be recorded.'],
         ].map(([q, a]) => `
