@@ -400,6 +400,27 @@ adminRouter.get('/stripe-status', requireOwner, async (req, res) => {
   }
 });
 
+// Read-only: check exactly what billing (if any) a specific client is attached to
+adminRouter.get('/client-billing', requireOwner, async (req, res) => {
+  const { clientId } = req.query;
+  if (!clientId) return res.status(400).json({ error: 'clientId required' });
+  try {
+    const [client] = await sql`SELECT id, business_name, email, tier, stripe_customer_id, stripe_subscription_id, status, created_at FROM clients WHERE id = ${clientId}`;
+    if (!client) return res.status(404).json({ error: 'not found' });
+
+    let subscription = null;
+    if (client.stripe_subscription_id) {
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+      const sub = await stripe.subscriptions.retrieve(client.stripe_subscription_id);
+      subscription = { status: sub.status, items: sub.items.data.map(i => ({ price: i.price.id, amount: i.price.unit_amount })) };
+    }
+
+    res.json({ ...client, subscription });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 adminRouter.get('/email-preview', requireOwner, (req, res) => {
   const { html } = portalWelcomeEmail({
     businessName: 'Smith Plumbing & HVAC',
