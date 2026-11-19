@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import twilio from 'twilio';
+import Stripe from 'stripe';
 import { v4 as uuidv4 } from 'uuid';
 import sql from '../db/index.js';
 import { portalWelcomeEmail } from '../services/email.js';
@@ -379,6 +380,22 @@ adminRouter.post('/fix-client-login', requireOwner, async (req, res) => {
     res.json({ success: true, email, portalToken });
   } catch (err) {
     console.error('[admin] fix-client-login failed:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Read-only check of the Stripe account's own verification/activation status
+adminRouter.get('/stripe-status', requireOwner, async (req, res) => {
+  try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const account = await stripe.accounts.retrieve();
+    res.json({
+      charges_enabled: account.charges_enabled,
+      payouts_enabled: account.payouts_enabled,
+      details_submitted: account.details_submitted,
+      requirements: account.requirements,
+    });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
